@@ -368,8 +368,8 @@ async def entering_and_exiting_room(IDm):
     #このIDmの生徒が部屋に入室->退室 もしくは退室->入室の処理をして、その生徒の状態偏移語の状態と所属サーバーを取得
     changed_status, belong = db.changeStudentRoomStatus(IDm) 
     
-    #部屋人数取得と学生番号リストの取得
-    count, st_nums = db.getRoom()
+    #部屋人数の取得
+    count, _ = db.getRoom()
 
     #所属AかBでembedカラーを変更
     if mybot.cfg.first_server_name == belong:
