@@ -6,17 +6,36 @@ import binascii
 import nfc
 
 class MyCardReader(object):
+    def __init__(self):
+        #カードがタッチしているか
+        self.on_card = False
+
     def on_connect(self, tag):
+        self.on_card = False
         #IDmのみ取得
         self.idm = binascii.hexlify(tag._nfcid) #取得したIDm
         return True
 
-    def read_id(self):
+    #経過時間(n秒経過後Trueを返す)
+    def afrer(self, started, n):
+        return time.time() - started > n and not self.on_card
+
+    #idmを読み取るためのメソッド(タイムアウトまで1秒)
+    def read_id(self, started, n):
         clf = nfc.ContactlessFrontend('usb') #USB機器との接続するためのオブジェクト
         try:
-            clf.connect(rdwr={'on-connect': self.on_connect}) #ここでカードがタッチ→離されるまでずっと待機し続けている
+            rdwr_options = {
+                'on-connect': self.on_connect,
+                'on-release': self.on_release
+            }
+            #ここでカードがタッチ→離されるまでずっと待機し続けている
+            clf.connect(
+                rdwr=rdwr_options,
+                terminate=partial(self.afrer, started, n)
+            ) 
         finally:
             clf.close()
     
     def get_idm(self):
         return self.idm
+#read_id(time.time(), 1)
