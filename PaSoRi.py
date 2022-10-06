@@ -20,11 +20,3 @@ class MyCardReader(object):
     
     def get_idm(self):
         return self.idm
-
-def main():
-    #MyCardReaderクラスをインスタンス化
-    cardReader = MyCardReader() 
-
-    while True:
-        #タッチ待ち
-        cardReader.read_id()
