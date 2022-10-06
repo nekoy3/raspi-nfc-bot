@@ -62,7 +62,7 @@ class DatabaseClass():
     #カードidで生徒を検索する、返り値は学籍番号
     def getStudentNumberByCard(self, IDm):
         cur = self.conn.cursor()
-        cur.execute('SELECT st_num FROM students WHERE cid=?', (IDm,) )
+        cur.execute('SELECT sid FROM students WHERE cid=?', (IDm,) )
         exist = cur.fetchone()
         cur.close()
         if exist is None:
