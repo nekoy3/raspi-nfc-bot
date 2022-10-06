@@ -104,6 +104,11 @@ class DatabaseClass():
             st_nums.append(record[0])
         cur.close()
         return count, st_nums
+    
+    #すべての入室中生徒のフラグを下ろすメソッド
+    def roomFlagAllFalse(self):
+        cur = self.conn.cursor()
+        cur.execte('UPDATE students SET student_room_status=False')
 
     #特定のカードIDのレコードを削除
     def deleteRecord(self, cid):

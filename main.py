@@ -470,12 +470,7 @@ async def loop():
         #人数カウントリセット時刻になったとき
         if now == mybot.cfg.daily_reset_time: 
             if count != 0:
-                #dbのフラグをすべてリセットする処理を
-                #
-                #
-                # 後から追加してください(dbにインスタンスメソッドを持たせる)
-                #
-                #
+                db.roomFlagAllFalse()
                 logfile_rw.write_logfile("info", "bot", "Room status all reset.")
 
                 embed = add_embed("現在の人数", f'人数が0で無かったため、リセットされました。\n入室中のメンバー -->\n{stNumString}', "one")
