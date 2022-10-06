@@ -84,7 +84,7 @@ class DatabaseClass():
     #適合するレコードを全部取得してprintするメソッド(検証用)
     def printFetchStudent(self, cid):
         cur = self.conn.cursor()
-        cur.execute('SELECT student_room_status, belong FROM students WHERE cid=?', (cid,) )
+        cur.execute('SELECT student_room_status, belong, sid FROM students WHERE cid=?', (cid,) )
         fetch_tuple = cur.fetchall()
         print(str(fetch_tuple))
     
