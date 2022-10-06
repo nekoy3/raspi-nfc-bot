@@ -94,15 +94,16 @@ class DatabaseClass():
         return changed_status, belong
     
     #現時点での入室人数と学籍番号を取得
-    def getRoomCount(self):
+    def getRoom(self):
         cur = self.conn.cursor()
-        cur.execute('SELECT student_room_status FROM students')
+        cur.execute('SELECT sid, student_room_status FROM students WHERE student_room_status=True')
         count = 0
+        st_nums = []
         for record in cur.fetchall(): #レコード数ループ
-            if record[0]:
-                count+=1
+            count+=1
+            st_nums.append(record[0])
         cur.close()
-        return count
+        return count, st_nums
 
     #特定のカードIDのレコードを削除
     def deleteRecord(self, cid):
