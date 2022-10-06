@@ -10,10 +10,16 @@ class MyCardReader(object):
         #カードがタッチしているか
         self.on_card = False
 
+    #カードタッチされたときの処理
     def on_connect(self, tag):
         self.on_card = False
         #IDmのみ取得
         self.idm = binascii.hexlify(tag._nfcid) #取得したIDm
+        return True
+    
+    #カードが離されたときの処理
+    def on_release(self, tag):
+        self.on_card = False
         return True
 
     #経過時間(n秒経過後Trueを返す)
