@@ -461,6 +461,9 @@ async def loop():
     while True:
         #部屋人数取得
         count, st_nums = db.getRoom()
+        stNumString = ""
+        for st_num in st_nums:
+            stNumString += st_num + " "
 
         #現在時刻取得
         now = datetime.now().strftime('%H:%M')
@@ -475,9 +478,6 @@ async def loop():
                 #
                 logfile_rw.write_logfile("info", "bot", "Room status all reset.")
 
-                stNumString = ""
-                for st_num in st_nums:
-                    stNumString += st_num + " "
                 embed = add_embed("現在の人数", f'人数が0で無かったため、リセットされました。\n入室中のメンバー -->\n{stNumString}', "one")
                 for i in chs:
                     await i.send(embed=embed)
@@ -496,7 +496,7 @@ async def loop():
         
         #上記処理でフラグが経ってる間警告を表示しないが、フラグが下がっており人数オーバーの時警告を表示する
         if count > mybot.cfg.max_count and stop_warn_infomation_flag == False: #人数が多く、停止フラグがFalse
-            embed = add_embed("警告", f"定員{mybot.cfg.max_count}人に対して、現在大人数が入室しています。\n換気し、私語を控えるようにしてください。", "er")
+            embed = add_embed("警告", f"定員{mybot.cfg.max_count}人に対して、現在大人数が入室しています。\n換気し、私語を控えるようにしてください。\n現在入室中のメンバー -->\n{stNumString}", "er")
             [await channel.send(embed=embed) for channel in chs] #各チャンネルに警告を表示
             stop_warn_infomation_flag = True #フラグを立てる
 
