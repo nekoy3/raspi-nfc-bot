@@ -460,7 +460,7 @@ async def loop():
     
     while True:
         #部屋人数取得
-        count = db.getRoom()
+        count, st_nums = db.getRoom()
 
         #現在時刻取得
         now = datetime.now().strftime('%H:%M')
@@ -474,8 +474,13 @@ async def loop():
                 #
                 #
                 logfile_rw.write_logfile("info", "bot", "Room status all reset.")
+
+                stNumString = ""
+                for st_num in st_nums:
+                    stNumString += st_num + " "
+                embed = add_embed("現在の人数", f'人数が0で無かったため、リセットされました。\n入室中のメンバー -->\n{stNumString}', "one")
                 for i in chs:
-                    await i.send(embed=add_embed("現在の人数", f'人数が0で無かったため、リセットされました。', "one"))
+                    await i.send(embed=embed)
             
             #ログファイルを再生成する
             f_global.f.close()
