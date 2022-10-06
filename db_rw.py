@@ -87,6 +87,7 @@ class DatabaseClass():
         cur.execute('SELECT student_room_status, belong, sid FROM students WHERE cid=?', (cid,) )
         fetch_tuple = cur.fetchall()
         print(str(fetch_tuple))
+        print("<" + cid + ">")
     
     #レコードをカードidで検索して、変更後ステータスと所属を返す
     def changeStudentRoomStatus(self, cid):
