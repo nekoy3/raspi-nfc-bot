@@ -357,7 +357,7 @@ async def regist(interaction: discord.Interaction, st_num: str, st_name: str, st
 
     #registセッション(登録作業の流れ）を開始 グローバルで所持するため１つのみ同時実行できる。
     regist_session = RegistSession(session_id, interaction, st_name, st_num, st_belong.value) #インスタンス生成 グローバルで所有する
-    logfile_rw.write_logfile('info', 'session', 'Regist session created. ' + session_id)
+    logfile_rw.write_logfile('info', 'session', 'Regist session created. ' + str(session_id))
 
     #ボタンの有効期限を1分で設ける（時間制限を別スレッドに投げる）
     tasks.append(asyncio.get_event_loop().create_task(session_button_timelimit(session_id, 60))) 
