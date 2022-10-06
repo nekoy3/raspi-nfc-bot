@@ -7,7 +7,7 @@ import asyncio
 import aiohttp
 import random
 import datetime
-import traceback
+import time
 
 from db_rw import DatabaseClass
 import start
@@ -422,7 +422,7 @@ async def card_touch_waiting_loop():
     cardReader = MyCardReader() 
     while True:
         await asyncio.sleep(1)
-        await cardReader.read_id() #タッチされて離されるまで待機し続ける
+        await cardReader.read_id(time.time(), 1) #タッチされて離されるまで待機し続ける
         
         #カードからIDmを取得する
         IDm = cardReader.get_idm() 
