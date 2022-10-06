@@ -443,7 +443,7 @@ async def card_touch_waiting_loop():
         else:
             for ch in chs:
                 await ch.send(content='登録されていないカードが検出されました。\n初めて利用する場合は/registコマンドを使って登録処理を行ってからカードをタッチしてください。')
-            logfile_rw.write_logfile('info', 'card', 'This card is not registed. IDm=' + IDm)
+            logfile_rw.write_logfile('info', 'card', 'This card is not registed. IDm=' + str(IDm))
 
 #コマンドを追加(ry
 @client.tree.command()
