@@ -27,7 +27,7 @@ class MyCardReader(object):
         return time.time() - started > n and not self.on_card
 
     #idmを読み取るためのメソッド(タイムアウトまで1秒)
-    def read_id(self, started, n):
+    async def read_id(self, started, n):
         clf = nfc.ContactlessFrontend('usb') #USB機器との接続するためのオブジェクト
         try:
             rdwr_options = {
