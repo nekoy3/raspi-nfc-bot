@@ -9,6 +9,7 @@ class MyCardReader(object):
     def __init__(self):
         #カードがタッチしているか
         self.on_card = False
+        self.idm = 0
 
     #カードタッチされたときの処理
     def on_connect(self, tag):
@@ -43,5 +44,7 @@ class MyCardReader(object):
             clf.close()
     
     def get_idm(self):
-        return self.idm
+        tmp = self.idm
+        self.idm = 0
+        return tmp
 #read_id(time.time(), 1)

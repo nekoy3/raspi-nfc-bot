@@ -424,9 +424,13 @@ async def card_touch_waiting_loop():
         await asyncio.sleep(1)
         await cardReader.read_id(time.time(), 1) #タッチされて離されるまで待機し続ける
         
-        #カードからIDmを取得する
+        #カードからIDmを取得する、取得できてなければ0が返る
         IDm = cardReader.get_idm() 
         
+        #カードを取得できていなければこれ以降の処理をpass
+        if IDm == 0:
+            continue
+
         #データベースを検索、存在すればroom_status(bool)も取得
         #room_statusはTrueで入室中、Falseで入室していないことを意味する
         student_room_status = db.getRoomStateByCard(IDm) #部屋状況(bool)を返す、存在しない場合None
