@@ -80,15 +80,21 @@ class DatabaseClass():
             return None
         else:
             return exist[0]
+
+    #適合するレコードを全部取得してprintするメソッド(検証用)
+    def printFetchStudent(self, cid):
+        cur = self.conn.cursor()
+        cur.execute('SELECT student_room_status, belong FROM students WHERE cid=?', (cid,) )
+        fetch_tuple = cur.fetchall()
+        print(str(fetch_tuple))
     
     #レコードをカードidで検索して、変更後ステータスと所属を返す
     def changeStudentRoomStatus(self, cid):
         cur = self.conn.cursor()
-        cur.execute('SELECT student_room_status, belong, sid FROM students WHERE cid=?', (cid,) )
+        cur.execute('SELECT student_room_status, belong FROM students WHERE cid=?', (cid,) )
         fetch_tuple = cur.fetchone()
         student_room_status = fetch_tuple[0]
         belong = fetch_tuple[1]
-        print(fetch_tuple[2])
         changed_status = not student_room_status
         cur.execute('UPDATE students SET student_room_status=? WHERE cid=?', (changed_status, cid))
         cur.close()
@@ -109,7 +115,7 @@ class DatabaseClass():
     #すべての入室中生徒のフラグを下ろすメソッド
     def roomFlagAllFalse(self):
         cur = self.conn.cursor()
-        cur.execte('UPDATE students SET student_room_status=False')
+        cur.execute('UPDATE students SET student_room_status=False')
 
     #特定のカードIDのレコードを削除
     def deleteRecord(self, cid):
