@@ -5,7 +5,7 @@ def main(args):
     conn = sqlite3.connect("student_list.db")
     cur = conn.cursor()
     if args[1] == "get":
-        cur.execute("SELECT * FROM student")
+        cur.execute("SELECT * FROM students")
         exist = cur.fetchall()
         print(str(exist))
     cur.close()
