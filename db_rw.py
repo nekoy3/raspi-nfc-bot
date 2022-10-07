@@ -106,7 +106,7 @@ class DatabaseClass():
         student_room_status = fetch_tuple[0]
         belong = fetch_tuple[1]
         changed_status = not student_room_status
-        cur.execute('UPDATE students SET student_room_status=? WHERE idm=?', (changed_status, idm))
+        cur.execute('UPDATE students INNER JOIN cards ON students.user_id=cards.user_id SET student_room_status=? WHERE idm=?', (changed_status, idm))
         self.conn.commit()
         cur.close()
         return changed_status, belong
