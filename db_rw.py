@@ -127,10 +127,10 @@ class DatabaseClass():
         cur = self.conn.cursor()
         cur.execute('UPDATE students SET student_room_status=False')
 
-    #特定のカードIDのレコードを削除
+    #特定のカードIDのcardsテーブルレコードを削除
     def deleteRecord(self, idm):
         cur = self.conn.cursor()
-        cur.execute('DELETE FROM students WHERE idm=?', (idm,) )
+        cur.execute('DELETE FROM cards WHERE idm=?', (idm,) )
         self.conn.commit()
         cur.close()
     
