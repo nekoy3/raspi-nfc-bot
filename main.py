@@ -435,6 +435,8 @@ async def unregist(interaction: discord.Interaction): #登録解除コマンド
         ])
 async def card(interaction: discord.Interaction, select: app_commands.Choice[str]):
     pass
+    #ユーザがDBに登録されていない場合、registコマンドで最初に一枚登録してもらう趣旨の説明をして終わる
+    
     #カードが一枚の時、これ以上削除できない趣旨の通知をして終わる
 
     #カード追加処理
