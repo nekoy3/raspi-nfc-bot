@@ -171,15 +171,20 @@ regist_reset_flag = False #registモードを解除するためのフラグ
 async def regist_timelimit(): 
     global regist_mode_flag, regist_reset_flag
     regist_mode_flag = True
+    await client.change_presence(status=discord.Status.online, activity=discord.Game('Registing mode'))
+    print("regist mode on") #デバッグ用
     sec = 60
     while sec > 0:
         await asyncio.sleep(1)
         if regist_reset_flag:
             regist_reset_flag = False
+            print("regist mode broken")
             break
         sec-=1
         #print(sec)
     regist_mode_flag = False
+    await client.change_presence(status=discord.Status.online, activity=discord.Game('/register, /gc'))
+    print("regist mode off")
 '''
 embedのボタンについての処理
 ボタンは毎回embedを生成するとともにボタンのインスタンスとして生成し、ボタンごとに処理を持つ。
@@ -344,6 +349,8 @@ async def regist(interaction: discord.Interaction, st_num: str, st_name: str, st
         logfile_rw.write_logfile('info', 'session', f'Regist cancelled by duplicate. {interaction.user.name}')
         return
     
+    #registコマンド実行中のフラグはregist_timelimitメソッドで動作
+
     #registコマンド実行時embedを生成
     embed = get_descript_embed('部屋認証システムへの登録', f'{st_belong.value}\n学籍番号：{st_num}　名前：{st_name}様\n学生証の登録を開始します。よろしいですか？', interaction.user.display_name, interaction.user.display_avatar, interaction.created_at, "ボタンは一度のみ、この表示のあと1分有効です。")
 
