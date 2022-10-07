@@ -49,7 +49,7 @@ class DatabaseClass():
     #カードidで生徒を検索する、返り値は部屋状況(bool)
     def getRoomStateByCard(self, idm):
         cur = self.conn.cursor()
-        cur.execute('SELECT student_room_status FROM students INNER JOIN cards user_id=user_id WHERE idm=?', (idm,) )
+        cur.execute('SELECT student_room_status FROM students INNER JOIN cards ON user_id=user_id WHERE idm=?', (idm,) )
         exist = cur.fetchone()
         cur.close()
         if exist is None:
@@ -71,7 +71,7 @@ class DatabaseClass():
     #カードidで生徒を検索する、返り値は学籍番号
     def getStudentNumberByCard(self, IDm):
         cur = self.conn.cursor()
-        cur.execute('SELECT sid FROM students INNER JOIN cards user_id=user_id WHERE idm=?', (IDm,) )
+        cur.execute('SELECT sid FROM students INNER JOIN cards ON user_id=user_id WHERE idm=?', (IDm,) )
         exist = cur.fetchone()
         cur.close()
         if exist is None:
@@ -93,7 +93,7 @@ class DatabaseClass():
     #適合するレコードを全部取得してprintするメソッド(検証用)
     def printFetchStudent(self, idm):
         cur = self.conn.cursor()
-        cur.execute('SELECT student_room_status, belong, sid FROM students INNER JOIN cards user_id=user_id WHERE idm=?', (idm,) )
+        cur.execute('SELECT student_room_status, belong, sid FROM students INNER JOIN cards ON user_id=user_id WHERE idm=?', (idm,) )
         fetch_tuple = cur.fetchall()
         print(str(fetch_tuple))
         print("<" + str(idm) + ">")
@@ -101,7 +101,7 @@ class DatabaseClass():
     #レコードをカードidで検索して、変更後ステータスと所属を返す
     def changeStudentRoomStatus(self, idm):
         cur = self.conn.cursor()
-        cur.execute('SELECT student_room_status, belong FROM students INNER JOIN cards user_id=user_id WHERE idm=?', (idm,) )
+        cur.execute('SELECT student_room_status, belong FROM students INNER JOIN cards ON user_id=user_id WHERE idm=?', (idm,) )
         fetch_tuple = cur.fetchone()
         student_room_status = fetch_tuple[0]
         belong = fetch_tuple[1]
