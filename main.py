@@ -181,7 +181,7 @@ async def regist_timelimit():
             print("regist mode broken")
             break
         sec-=1
-        #print(sec)
+        print(sec)
     regist_mode_flag = False
     await client.change_presence(status=discord.Status.online, activity=discord.Game('/register, /gc'))
     print("regist mode off")
