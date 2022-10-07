@@ -173,7 +173,7 @@ async def regist_timelimit():
     regist_mode_flag = True
     await client.change_presence(status=discord.Status.online, activity=discord.Game('Registing mode'))
     print("regist mode on") #デバッグ用
-    sec = 60
+    sec = 15
     while sec > 0:
         await asyncio.sleep(1)
         if regist_reset_flag:
