@@ -291,17 +291,16 @@ async def unregist(interaction: discord.Interaction): #登録解除コマンド
         ])
 async def card(interaction: discord.Interaction, select: app_commands.Choice[str]):
     pass
-    #ユーザがDBに登録されていない場合、registコマンドで最初に一枚登録してもらう趣旨の説明をして終わる
+    #select.valueにカード追加登録であればcard_regist、削除ならcard_unregistの文字列が格納される
+    #(card_regist, card_unregist)ユーザがDBに登録されていない場合、registコマンドで最初に一枚登録してもらう趣旨の説明をして終わる
 
-    #カードが一枚の時、これ以上削除できない趣旨の通知をして終わる
+    #(card_unregist)カードが一枚の時、これ以上削除できない趣旨の通知をして終わる
 
-    #カード追加処理
+    #(card_regist)カード追加処理
+        #(上記処理中に）同一のカードがDBのどこかにあれば使用済みと表示し終了
 
-    #同一のカードがDBのどこかにあれば使用済みと表示し終了
-
-    #カード削除処理
-
-    #同一のカードが自分のユーザIDのレコードに存在しないとき未登録と表示し終了
+    #(card_unregist)カード削除処理
+        #(上記処理中に）同一のカードが自分のユーザIDのレコードに存在しないとき未登録と表示し終了
 
 #カードタッチを待機するためのメソッド(別スレッドに投げるためのメソッド)
 async def card_touch_waiting_loop():
