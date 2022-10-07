@@ -7,7 +7,10 @@ def main(args):
     if args[1] == "get":
         cur.execute("SELECT * FROM students")
         exist = cur.fetchall()
-        print(str(exist))
+        print("students\n" + str(exist))
+        cur.execute("SELECT * FROM cards")
+        exist = cur.fetchall()
+        print("cards\n" + str(exist))
     cur.close()
     conn.close()
 
