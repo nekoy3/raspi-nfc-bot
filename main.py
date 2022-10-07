@@ -394,7 +394,7 @@ async def entering_and_exiting_room(IDm):
         for ch in chs:
             await ch.send(embed=embed)
         st_num = db.getStudentNumberByCard(IDm)
-        logfile_rw.write_logfile('info', 'room', f'Changed room_status and Entering room. cid={IDm}, now_room_count={count} st_num={st_num} belong={belong}')
+        logfile_rw.write_logfile('info', 'room', f'Changed room_status and Entering room. idm={IDm}, now_room_count={count} st_num={st_num} belong={belong}')
     
     #生徒が退室した場合の処理
     else:
@@ -402,7 +402,7 @@ async def entering_and_exiting_room(IDm):
         for ch in chs:
             await ch.send(embed=embed)
         st_num = db.getStudentNumberByCard(IDm)
-        logfile_rw.write_logfile('info', 'room', f'Changed room_status and Exiting room. cid={IDm}, now_room_count={count} st_num={st_num} belong={belong}')
+        logfile_rw.write_logfile('info', 'room', f'Changed room_status and Exiting room. idm={IDm}, now_room_count={count} st_num={st_num} belong={belong}')
 
 @client.tree.command()#コマンドを登録するDiscordサーバ（tree)でスラッシュコマンドを追加するデコレータ
 async def unregist(interaction: discord.Interaction): #登録解除コマンド
