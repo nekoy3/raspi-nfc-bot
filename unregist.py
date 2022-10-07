@@ -6,9 +6,9 @@ import f_global as fg
 
 #登録解除ボタンセットのクラス
 class UnregistButton(discord.ui.View):
-    def __init__(self, session_id):
+    def __init__(self, session_id, db):
         super().__init__()
-        self.add_item(UnregistOkButton(session_id))
+        self.add_item(UnregistOkButton(session_id, db))
         self.add_item(UnregistNoButton(session_id))
 
 #登録解除OKボタン
