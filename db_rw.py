@@ -18,15 +18,21 @@ class DatabaseClass():
     def createTableStudents(self):
         cur = self.conn.cursor()
         # 大文字部はSQL文。小文字でも問題ない
-        cur.execute(
-            'CREATE TABLE IF NOT EXISTS students(id INTEGER PRIMARY KEY AUTOINCREMENT, sid STRING, sname STRING, idm STRING, user_id INT, date STRING, student_room_status boolean, belong STRING )'
-            )
+        cur.execute( #studentsテーブルを作成する snameとuser_id間のidmを削除
+            'CREATE TABLE IF NOT EXISTS students(id INTEGER PRIMARY KEY AUTOINCREMENT, sid STRING, sname STRING, user_id INT, date STRING, student_room_status boolean, belong STRING )'
+        )
+        cur.execute( #carsテーブルを作成する user_idを主キーとしidmを複数個登録できる
+            'CREATE TABLE IF NOT EXISTS cards( user_id INT, idm BLOB )'
+        )
+
+        cur.close()
     
     #生徒のレコードを追加する
     def addRecord(self, sid, sname, idm, user_id, date, student_room_status, belong): #id, 学籍番号, 生徒名, カードID, 登録日, 入室フラグ
         # sqliteを操作するカーソルオブジェクトを作成
         cur = self.conn.cursor()
-        cur.execute('INSERT INTO students(sid, sname, idm, user_id, date, student_room_status, belong) values(?, ?, ?, ?, ?, ?, ?) ', [sid, sname, idm, user_id, date, student_room_status, belong])
+        cur.execute('INSERT INTO students(sid, sname, user_id, date, student_room_status, belong) values(?, ?, ?, ?, ?, ?) ', [sid, sname, user_id, date, student_room_status, belong])
+        cur.execute('INSERT INTO cards(user_id, idm) values(?, ?)', [user_id, idm])
         self.conn.commit() # データベースへコミット これで変更が反映される
         cur.close()
     
@@ -146,3 +152,6 @@ class DatabaseClass():
     cur.execute('SELECT * FROM students')
     print(cur.fetchall())
     '''
+
+#データベース構造において、studentsテーブルにはそれぞれのdiscordユーザID等は保持するが、
+#discordユーザIDごとに複数のカードを登録することが出来ることにする。
