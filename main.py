@@ -13,11 +13,11 @@ from db_rw import DatabaseClass
 import start
 from PaSoRi import MyCardReader
 import logfile_rw
-import f_global
+import f_global as fg
+import regist as r
+import unregist as ur
 
 client = None #bot本体のためのインスタンス（になるもの）
-tasks = [] #別スレッドに投げたコルーチンオブジェクト用のリスト
-sessions = [] #registコマンド等のやりとりをID別に管理するために保管するためのリスト
 regist_session = None #registコマンド実行中に他でregistを実行しないようにロックするための変数
 unregist_session = None #unregistコマンドで上記同様
 chs = [] #コマンド実行用チャンネルを取得して格納するリスト
@@ -88,7 +88,7 @@ async def on_ready(): #on_readyはbotが起動しログイン完了時に一度�
     
     #カードタッチ待機メソッドを別スレッドに投げる
     #非同期処理についてはこのファイルの最下行に説明がある
-    tasks.append(asyncio.get_event_loop().create_task(card_touch_waiting_loop()))
+    fg.tasks.append(asyncio.get_event_loop().create_task(card_touch_waiting_loop()))
 
 #webhookを送信するメソッド
 async def webhook_sent(channel_id, user_name, user_icon, **kwargs):
@@ -167,24 +167,6 @@ async def on_message(message): #on_messageはメッセージが送信された�
 regist_mode_flag = False #registモードであるかを確認するフラグ
 regist_reset_flag = False #registモードを解除するためのフラグ
 
-#registerモードをonにし、新規registerコマンド受付を停止、登録済みカードはレコードを比較し通常通り認証する
-async def regist_timelimit(): 
-    global regist_mode_flag, regist_reset_flag
-    regist_mode_flag = True
-    await client.change_presence(status=discord.Status.online, activity=discord.Game('Registing mode'))
-    #print("regist mode on") #デバッグ用
-    sec = 15
-    while sec > 0:
-        await asyncio.sleep(1)
-        if regist_reset_flag:
-            regist_reset_flag = False
-            print("regist mode broken")
-            break
-        sec-=1
-        #print(sec)
-    regist_mode_flag = False
-    await client.change_presence(status=discord.Status.online, activity=discord.Game('/register, /gc'))
-    #print("regist mode off")
 '''
 embedのボタンについての処理
 ボタンは毎回embedを生成するとともにボタンのインスタンスとして生成し、ボタンごとに処理を持つ。
@@ -202,139 +184,18 @@ session_idリストに投げると同時にsession_button_timelimitメソッド�
 #removeされる前にbuttonを押されてセッションが消滅している場合もあるため、投げっぱなしになる
 #ボタンの制限時間を設ける。
 async def session_button_timelimit(session_id, time): 
-    global sessions
     logfile_rw.write_logfile('info', 'session', f'Session {session_id} button enabled.')
     for i in range(time):
         await asyncio.sleep(1)
-    sessions.remove(session_id) if session_id in sessions else None
+    fg.sessions.remove(session_id) if session_id in fg.sessions else None
     logfile_rw.write_logfile('info', 'session', f'Session {session_id} button disabled.')
 
 #セッションIDのための乱数を生成する
 def make_session_id():
-    global sessions
     r = random.randint(0, 2147483647)
-    while r in sessions: #重複するセッションIDがある
+    while r in fg.sessions: #重複するセッションIDがある
         r = random.randint(0, 2147483647)
     return r
-
-#registコマンドでボタンを表示するためにボタンのクラスを追加する
-class RegistButton(discord.ui.View):
-    def __init__(self, session_id):
-        super().__init__()
-        self.add_item(RegistOkButton(session_id))
-        self.add_item(RegistNoButton(session_id))
-
-#registコマンドでOKボタンを押したときの処理(登録処理を開始する)
-class RegistOkButton(discord.ui.Button):
-    def __init__(self, session_id):
-        super().__init__(label="登録する", style=discord.ButtonStyle.green)
-        self.session_id = session_id
-
-    async def callback(self, interaction: discord.Interaction):
-        global sessions
-        print(str(self.session_id) + " / " + str(sessions))
-        if self.session_id in sessions:
-            await interaction.response.send_message('登録を受け付けました。今から1分以内にカードリーダーに自身のカードをタッチして登録してください。\n1分を超えた場合は再度コマンドを入力してください。', ephemeral=True)
-            tasks.append(asyncio.get_event_loop().create_task(regist_timelimit())) #registモード1分を測る
-            sessions.remove(self.session_id) if self.session_id in sessions else None
-        else:
-            await interaction.response.send_message('このボタンは有効期限が切れています。', ephemeral=True)
-
-#registコマンドでNOボタンを押したときの処理(登録処理をキャンセルする)
-class RegistNoButton(discord.ui.Button):
-    def __init__(self, session_id):
-        super().__init__(label="キャンセル", style=discord.ButtonStyle.secondary)
-        self.session_id = session_id
-
-    async def callback(self, interaction: discord.Interaction):
-        global sessions
-        if self.session_id in sessions:
-            await interaction.response.send_message('登録受付をキャンセルしました。', ephemeral=True)
-            sessions.remove(self.session_id) if self.session_id in sessions else None
-        else:
-            await interaction.response.send_message('このボタンは有効期限が切れています。', ephemeral=True)
-
-#registコマンドが実行された時点でセッションをインスタンス化して保持し、時間切れで消滅する、セッションIDを保持し管理
-class RegistSession(): 
-    def __init__(self, session_id, interaction, st_name, st_num, st_belong):
-        self.session_id = session_id
-        self.interaction = interaction
-        self.st_name = st_name
-        self.st_num = st_num
-        self.st_belong = st_belong
-    
-    async def regist_record(self, IDm): #学生証登録
-        global regist_reset_flag
-        #「固有ID(int)」「学籍番号(string)」「名前(string)」「学生証ID(string)」「discordユーザid(int)」
-        # 「登録日(string or datetime)」「最終認証日(string or datetime)」「room_status(boolean)」「所属(string)」
-        now_datetime = datetime.datetime.now().strftime('%Y年%m月%d日 %H:%M')
-        dm_channel = await self.interaction.user.create_dm()
-        user_id = self.interaction.user.id
-
-        try:
-            db.addRecord(self.st_num, self.st_name, IDm, user_id, now_datetime, True, self.st_belong)
-        except Exception as e:
-            await dm_channel.send(content="エラーが発生しました。時間を空けてからお試しください。\n" + str(e))
-            logfile_rw.write_logfile('error', 'session', f'Session {self.session_id} regist error. {self.st_name} {IDm} error->{str(e)}')
-            regist_reset_flag = True #regist_timelimitメソッドでregistモードをリセットするためのフラグ
-        else:
-            await dm_channel.send(content=f"学生証の登録が完了しました。登録したデータは/registを実行したチャンネルで/unregistを実行すると削除できます。\nカードID={IDm} 学籍番号={self.st_num} 名前={self.st_name} 様\n登録日時={now_datetime} 所属={self.st_belong}")
-            logfile_rw.write_logfile('info', 'session', f'Session {self.session_id} registed record. {self.st_name} {IDm}')
-            regist_reset_flag = True
-        finally:
-            sessions.remove(self.session_id) if self.session_id in sessions else None
-
-#登録解除ボタンセットのクラス
-class UnregistButton(discord.ui.View):
-    def __init__(self, session_id):
-        super().__init__()
-        self.add_item(UnregistOkButton(session_id))
-        self.add_item(UnregistNoButton(session_id))
-
-#登録解除OKボタン
-class UnregistOkButton(discord.ui.Button):
-    def __init__(self, session_id):
-        super().__init__(label="削除する", style=discord.ButtonStyle.red)
-        self.session_id = session_id
-
-    async def callback(self, interaction: discord.Interaction):
-        global sessions, unregist_session
-        #print(str(session_id) + " / " + str(sessions))
-        record = db.getRecordIdByUser(interaction.user.id)
-        record_id = record[0]
-
-        if self.session_id in sessions:
-            await unregist_session.unregist_record(record_id)
-            await interaction.response.send_message('データを削除しました。', ephemeral=True)
-            sessions.remove(self.session_id) if self.session_id in sessions else None
-            logfile_rw.write_logfile('info', 'session', f'Session {self.session_id} unregisted record. {record[0]}')
-        
-        else:
-            await interaction.response.send_message('このボタンは有効期限が切れています。', ephemeral=True)
-
-#登録解除NOボタン
-class UnregistNoButton(discord.ui.Button):
-    def __init__(self, session_id):
-        super().__init__(label="キャンセル", style=discord.ButtonStyle.secondary)
-        self.session_id = session_id
-
-    async def callback(self, interaction: discord.Interaction):
-        global sessions
-        if self.session_id in sessions:
-            await interaction.response.send_message('登録受付をキャンセルしました。', ephemeral=True)
-            sessions.remove(self.session_id) if self.session_id in sessions else None
-        
-        else:
-            await interaction.response.send_message('このボタンは有効期限が切れています。', ephemeral=True)
-
-#registコマンドが実行された時点でセッションをインスタンス化して保持し、時間切れで消滅する、セッションIDを保持し管理
-class UnregistSession(): 
-    def __init__(self, session_id, interaction):
-        self.session_id = session_id
-        self.interaction = interaction
-
-    async def unregist_record(self, record_id):
-        db.removeRecord(record_id)
 
 @client.tree.command() #コマンドを登録するDiscordサーバ（tree)でスラッシュコマンドを追加するデコレータ
 @app_commands.describe(
@@ -361,18 +222,18 @@ async def regist(interaction: discord.Interaction, st_num: str, st_name: str, st
 
     session_id = make_session_id() #セッションIDを生成 
 
-    #registOkとNoボタンとembedを送信する
-    await interaction.response.send_message(embed=embed, view=RegistButton(session_id), ephemeral=True)
+    #egistOkとNoボタンとembedを送信する
+    await interaction.response.send_message(embed=embed, view=r.RegistButton(session_id, client), ephemeral=True)
 
     #ボタンのセッションIDをsession_idリストに投下
-    sessions.append(session_id)
+    fg.sessions.append(session_id)
 
     #registセッション(登録作業の流れ）を開始 グローバルで所持するため１つのみ同時実行できる。
-    regist_session = RegistSession(session_id, interaction, st_name, st_num, st_belong.value) #インスタンス生成 グローバルで所有する
+    regist_session = r.RegistSession(session_id, interaction, st_name, st_num, st_belong.value) #インスタンス生成 グローバルで所有する
     logfile_rw.write_logfile('info', 'session', 'Regist session created. ' + str(session_id))
 
     #ボタンの有効期限を1分で設ける（時間制限を別スレッドに投げる）
-    tasks.append(asyncio.get_event_loop().create_task(session_button_timelimit(session_id, 60))) 
+    fg.tasks.append(asyncio.get_event_loop().create_task(session_button_timelimit(session_id, 60))) 
 
 #入退室認証処理
 async def entering_and_exiting_room(IDm):
@@ -419,10 +280,10 @@ async def unregist(interaction: discord.Interaction): #登録解除コマンド
         embed = get_descript_embed('部屋認証システム登録情報の削除', '学生証データの削除を開始します。よろしいですか？', interaction.user.display_name, interaction.user.display_avatar, interaction.created_at, "ボタンは一度のみ、この表示のあと1分有効です。")
         session_id = make_session_id() #セッションIDを生成 
         #登録解除embedとボタンを生成
-        await interaction.response.send_message(embed=embed, view=UnregistButton(session_id), ephemeral=True)
-        sessions.append(session_id) #セッション生成
-        unregist_session = UnregistSession(session_id, interaction) #インスタンス生成 グローバルで所有する
-        tasks.append(asyncio.get_event_loop().create_task(session_button_timelimit(session_id, 60))) #ボタンの有効期限を1分で設ける
+        await interaction.response.send_message(embed=embed, view=ur.UnregistButton(session_id), ephemeral=True)
+        fg.sessions.append(session_id) #セッション生成
+        unregist_session = ur.UnregistSession(session_id, interaction, db) #インスタンス生成 グローバルで所有する
+        fg.tasks.append(asyncio.get_event_loop().create_task(session_button_timelimit(session_id, 60))) #ボタンの有効期限を1分で設ける
 
     #レコードが存在しない場合
     else:
@@ -473,7 +334,7 @@ async def card_touch_waiting_loop():
         
         #新規登録モードの場合(登録されてないとデータが取得できない)
         elif regist_mode_flag: 
-           await regist_session.regist_record(IDm)
+           await regist_session.regist_record(IDm, db)
         
         #得たカードのレコードが存在しないならば却下処理
         else:
