@@ -107,6 +107,7 @@ class DatabaseClass():
         belong = fetch_tuple[1]
         changed_status = not student_room_status
         cur.execute('UPDATE students SET student_room_status=? WHERE idm=?', (changed_status, idm))
+        self.conn.commit()
         cur.close()
         return changed_status, belong
     
