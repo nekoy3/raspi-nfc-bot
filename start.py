@@ -1,7 +1,5 @@
 import sys
 import discord
-import aiohttp
-from discord import Webhook
 
 import logfile_rw
 import cfg_rw
