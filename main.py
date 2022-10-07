@@ -331,8 +331,8 @@ class UnregistSession():
         self.session_id = session_id
         self.interaction = interaction
 
-    async def unregist_record(self, id):
-        db.removeRecord(id)
+    async def unregist_record(self, user_id):
+        db.removeRecord(user_id)
 
 @client.tree.command() #コマンドを登録するDiscordサーバ（tree)でスラッシュコマンドを追加するデコレータ
 @app_commands.describe(
