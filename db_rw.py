@@ -37,9 +37,10 @@ class DatabaseClass():
         cur.close()
     
     #生徒のレコードを削除する
-    def removeRecord(self, id):
+    def removeRecord(self, user_id):
         cur = self.conn.cursor()
-        cur.execute('DELETE FROM students where id=?', (id,))
+        cur.execute('DELETE FROM students WHERE user_id=?', (user_id,))
+        cur.execute('DELETE FROM cards WHERE user_id=?', (user_id,))
         self.conn.commit() # データベースへコミット これで変更が反映される
         cur.close()
 
@@ -54,7 +55,7 @@ class DatabaseClass():
         else:
             return exist[0]
     
-    #discordのユーザidで生徒を検索する、帰り値はレコードid
+    #discordのユーザidで生徒を検索する、帰り値はユーザid
     def getRecordIdByUser(self, user_id):
         cur = self.conn.cursor()
         cur.execute('SELECT * FROM students WHERE user_id=?', (user_id,) )
