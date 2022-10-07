@@ -234,7 +234,7 @@ class RegistOkButton(discord.ui.Button):
         global sessions
         print(str(self.session_id) + " / " + str(sessions))
         if self.session_id in sessions:
-            await interaction.response.send_message('登録を受け付けました。今から1分以内にカードリーダーに学生証をタッチして登録してください。\n1分を超えた場合は再度コマンドを入力してください。', ephemeral=True)
+            await interaction.response.send_message('登録を受け付けました。今から1分以内にカードリーダーに自身のカードをタッチして登録してください。\n1分を超えた場合は再度コマンドを入力してください。', ephemeral=True)
             tasks.append(asyncio.get_event_loop().create_task(regist_timelimit())) #registモード1分を測る
             sessions.remove(self.session_id) if self.session_id in sessions else None
         else:
@@ -436,7 +436,7 @@ async def unregist(interaction: discord.Interaction): #登録解除コマンド
 async def card(interaction: discord.Interaction, select: app_commands.Choice[str]):
     pass
     #ユーザがDBに登録されていない場合、registコマンドで最初に一枚登録してもらう趣旨の説明をして終わる
-    
+
     #カードが一枚の時、これ以上削除できない趣旨の通知をして終わる
 
     #カード追加処理
