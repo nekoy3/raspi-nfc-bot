@@ -106,7 +106,11 @@ class DatabaseClass():
         student_room_status = fetch_tuple[0]
         belong = fetch_tuple[1]
         changed_status = not student_room_status
-        cur.execute('UPDATE students SET student_room_status=? FROM students INNER JOIN cards ON students.user_id=cards.user_id WHERE idm=?', (changed_status, idm))
+
+        #結合してUPDATEを直接することが出来ないので、レコードidを取得して変更する
+        cur.execute('SELECT id FROM students INNER JOIN cards ON students.user_id=cards.user_id WHERE idm=?', (idm,))
+        record_id = cur.fetchone()[0]
+        cur.execute('UPDATE students SET student_room_status=? WHERE id=?', (changed_status, record_id))
         self.conn.commit()
         cur.close()
         return changed_status, belong
