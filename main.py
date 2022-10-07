@@ -428,6 +428,23 @@ async def unregist(interaction: discord.Interaction): #登録解除コマンド
     else:
         await interaction.response.send_message(content="登録されたデータを確認できませんでした。", ephemeral=True)
 
+@client.tree.command()
+@app_commands.choices(select=[
+        app_commands.Choice(name="カードの追加登録", value="card_regist"),
+        app_commands.Choice(name="カードの削除", value="card_unregist")
+        ])
+async def card(interaction: discord.Interaction, select: app_commands.Choice[str]):
+    pass
+    #カードが一枚の時、これ以上削除できない趣旨の通知をして終わる
+
+    #カード追加処理
+
+    #同一のカードがDBのどこかにあれば使用済みと表示し終了
+
+    #カード削除処理
+
+    #同一のカードが自分のユーザIDのレコードに存在しないとき未登録と表示し終了
+
 #カードタッチを待機するためのメソッド(別スレッドに投げるためのメソッド)
 async def card_touch_waiting_loop():
     global chs, regist_session
