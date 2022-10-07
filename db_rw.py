@@ -19,14 +19,14 @@ class DatabaseClass():
         cur = self.conn.cursor()
         # 大文字部はSQL文。小文字でも問題ない
         cur.execute(
-            'CREATE TABLE IF NOT EXISTS students(id INTEGER PRIMARY KEY AUTOINCREMENT, sid STRING, sname STRING, cid STRING, user_id INT, date STRING, student_room_status boolean, belong STRING )'
+            'CREATE TABLE IF NOT EXISTS students(id INTEGER PRIMARY KEY AUTOINCREMENT, sid STRING, sname STRING, idm STRING, user_id INT, date STRING, student_room_status boolean, belong STRING )'
             )
     
     #生徒のレコードを追加する
-    def addRecord(self, sid, sname, cid, user_id, date, student_room_status, belong): #id, 学籍番号, 生徒名, カードID, 登録日, 入室フラグ
+    def addRecord(self, sid, sname, idm, user_id, date, student_room_status, belong): #id, 学籍番号, 生徒名, カードID, 登録日, 入室フラグ
         # sqliteを操作するカーソルオブジェクトを作成
         cur = self.conn.cursor()
-        cur.execute('INSERT INTO students(sid, sname, cid, user_id, date, student_room_status, belong) values(?, ?, ?, ?, ?, ?, ?) ', [sid, sname, cid, user_id, date, student_room_status, belong])
+        cur.execute('INSERT INTO students(sid, sname, idm, user_id, date, student_room_status, belong) values(?, ?, ?, ?, ?, ?, ?) ', [sid, sname, idm, user_id, date, student_room_status, belong])
         self.conn.commit() # データベースへコミット これで変更が反映される
         cur.close()
     
@@ -38,9 +38,9 @@ class DatabaseClass():
         cur.close()
 
     #カードidで生徒を検索する、返り値は部屋状況(bool)
-    def getRoomStateByCard(self, cid):
+    def getRoomStateByCard(self, idm):
         cur = self.conn.cursor()
-        cur.execute('SELECT student_room_status FROM students WHERE cid=?', (cid,) )
+        cur.execute('SELECT student_room_status FROM students WHERE idm=?', (idm,) )
         exist = cur.fetchone()
         cur.close()
         if exist is None:
@@ -62,7 +62,7 @@ class DatabaseClass():
     #カードidで生徒を検索する、返り値は学籍番号
     def getStudentNumberByCard(self, IDm):
         cur = self.conn.cursor()
-        cur.execute('SELECT sid FROM students WHERE cid=?', (IDm,) )
+        cur.execute('SELECT sid FROM students WHERE idm=?', (IDm,) )
         exist = cur.fetchone()
         cur.close()
         if exist is None:
@@ -71,9 +71,9 @@ class DatabaseClass():
             return exist[0]
     
     #discordのユーザidで生徒を検索する、帰り値は所属
-    def getBelongByUser(self, cid):
+    def getBelongByUser(self, idm):
         cur = self.conn.cursor()
-        cur.execute('SELECT belong FROM students WHERE cid=?', (cid,) )
+        cur.execute('SELECT belong FROM students WHERE idm=?', (idm,) )
         exist = cur.fetchone()
         cur.close()
         if exist is None:
@@ -82,22 +82,22 @@ class DatabaseClass():
             return exist[0]
 
     #適合するレコードを全部取得してprintするメソッド(検証用)
-    def printFetchStudent(self, cid):
+    def printFetchStudent(self, idm):
         cur = self.conn.cursor()
-        cur.execute('SELECT student_room_status, belong, sid FROM students WHERE cid=?', (cid,) )
+        cur.execute('SELECT student_room_status, belong, sid FROM students WHERE idm=?', (idm,) )
         fetch_tuple = cur.fetchall()
         print(str(fetch_tuple))
-        print("<" + str(cid) + ">")
+        print("<" + str(idm) + ">")
     
     #レコードをカードidで検索して、変更後ステータスと所属を返す
-    def changeStudentRoomStatus(self, cid):
+    def changeStudentRoomStatus(self, idm):
         cur = self.conn.cursor()
-        cur.execute('SELECT student_room_status, belong FROM students WHERE cid=?', (cid,) )
+        cur.execute('SELECT student_room_status, belong FROM students WHERE idm=?', (idm,) )
         fetch_tuple = cur.fetchone()
         student_room_status = fetch_tuple[0]
         belong = fetch_tuple[1]
         changed_status = not student_room_status
-        cur.execute('UPDATE students SET student_room_status=? WHERE cid=?', (changed_status, cid))
+        cur.execute('UPDATE students SET student_room_status=? WHERE idm=?', (changed_status, idm))
         cur.close()
         return changed_status, belong
     
@@ -119,9 +119,9 @@ class DatabaseClass():
         cur.execute('UPDATE students SET student_room_status=False')
 
     #特定のカードIDのレコードを削除
-    def deleteRecord(self, cid):
+    def deleteRecord(self, idm):
         cur = self.conn.cursor()
-        cur.execute('DELETE FROM students WHERE cid=?', (cid,) )
+        cur.execute('DELETE FROM students WHERE idm=?', (idm,) )
         self.conn.commit()
         cur.close()
     
