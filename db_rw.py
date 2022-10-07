@@ -126,6 +126,8 @@ class DatabaseClass():
     def roomFlagAllFalse(self):
         cur = self.conn.cursor()
         cur.execute('UPDATE students SET student_room_status=False')
+        self.conn.commit()
+        cur.close()
 
     #特定のカードIDのcardsテーブルレコードを削除
     def deleteRecord(self, idm):
