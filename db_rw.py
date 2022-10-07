@@ -39,7 +39,7 @@ class DatabaseClass():
     #生徒のレコードを削除する
     def removeRecord(self, record_id):
         cur = self.conn.cursor()
-        cur.execute('SELECT user_id FROM students WHERE record_id=?', (record_id,))
+        cur.execute('SELECT user_id FROM students WHERE id=?', (record_id,))
         user_id = cur.fetchone()[0]
         cur.execute('DELETE FROM students WHERE id=?', (record_id,))
         cur.execute('DELETE FROM cards WHERE user_id=?', (user_id,))
