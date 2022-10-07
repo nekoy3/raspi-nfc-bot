@@ -172,7 +172,7 @@ async def regist_timelimit():
     global regist_mode_flag, regist_reset_flag
     regist_mode_flag = True
     await client.change_presence(status=discord.Status.online, activity=discord.Game('Registing mode'))
-    print("regist mode on") #デバッグ用
+    #print("regist mode on") #デバッグ用
     sec = 15
     while sec > 0:
         await asyncio.sleep(1)
@@ -181,10 +181,10 @@ async def regist_timelimit():
             print("regist mode broken")
             break
         sec-=1
-        print(sec)
+        #print(sec)
     regist_mode_flag = False
     await client.change_presence(status=discord.Status.online, activity=discord.Game('/register, /gc'))
-    print("regist mode off")
+    #print("regist mode off")
 '''
 embedのボタンについての処理
 ボタンは毎回embedを生成するとともにボタンのインスタンスとして生成し、ボタンごとに処理を持つ。
@@ -210,7 +210,7 @@ async def session_button_timelimit(session_id, time):
     logfile_rw.write_logfile('info', 'session', f'Session {session_id} button disabled.')
 
 #セッションIDのための乱数を生成する
-def make_random_id():
+def make_session_id():
     global sessions
     r = random.randint(0, 2147483647)
     while r in sessions: #重複するセッションIDがある
@@ -357,7 +357,7 @@ async def regist(interaction: discord.Interaction, st_num: str, st_name: str, st
     #registコマンド実行時embedを生成
     embed = get_descript_embed('部屋認証システムへの登録', f'{st_belong.value}\n学籍番号：{st_num}　名前：{st_name}様\n学生証の登録を開始します。よろしいですか？', interaction.user.display_name, interaction.user.display_avatar, interaction.created_at, "ボタンは一度のみ、この表示のあと1分有効です。")
 
-    session_id = make_random_id() #セッションIDを生成 
+    session_id = make_session_id() #セッションIDを生成 
 
     #registOkとNoボタンとembedを送信する
     await interaction.response.send_message(embed=embed, view=RegistButton(session_id), ephemeral=True)
@@ -415,7 +415,7 @@ async def unregist(interaction: discord.Interaction): #登録解除コマンド
     #データベースからその生徒のレコードを取得できた場合、登録解除処理を続行
     if record_id:
         embed = get_descript_embed('部屋認証システム登録情報の削除', '学生証データの削除を開始します。よろしいですか？', interaction.user.display_name, interaction.user.display_avatar, interaction.created_at, "ボタンは一度のみ、この表示のあと1分有効です。")
-        session_id = make_random_id() #セッションIDを生成 
+        session_id = make_session_id() #セッションIDを生成 
         #登録解除embedとボタンを生成
         await interaction.response.send_message(embed=embed, view=UnregistButton(session_id), ephemeral=True)
         sessions.append(session_id) #セッション生成
