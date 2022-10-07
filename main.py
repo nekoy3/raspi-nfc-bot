@@ -18,8 +18,6 @@ import regist as r
 import unregist as ur
 
 client = None #bot本体のためのインスタンス（になるもの）
-regist_session = None #registコマンド実行中に他でregistを実行しないようにロックするための変数
-unregist_session = None #unregistコマンドで上記同様
 chs = [] #コマンド実行用チャンネルを取得して格納するリスト
 guilds = [] #コマンド実装するdiscordサーバーのIDを格納するリスト
 db = DatabaseClass() #データベース操作関連クラスのインスタンス化
@@ -164,8 +162,8 @@ async def on_message(message): #on_messageはメッセージが送信された�
     
         await message.reply(content='送信しました。', delete_after=3.0)
 
-regist_mode_flag = False #registモードであるかを確認するフラグ
-regist_reset_flag = False #registモードを解除するためのフラグ
+fg.regist_mode_flag = False #registモードであるかを確認するフラグ
+fg.regist_reset_flag = False #registモードを解除するためのフラグ
 
 '''
 embedのボタンについての処理
@@ -208,9 +206,8 @@ def make_session_id():
         app_commands.Choice(name=mybot.cfg.second_server_name, value=mybot.cfg.second_server_name)
         ]) #st_belong引数で選択肢を表示するためのデコレータ
 async def regist(interaction: discord.Interaction, st_num: str, st_name: str, st_belong: app_commands.Choice[str]):
-    global regist_session
     #registセッション保持中の場合弾く
-    if regist_mode_flag:
+    if fg.regist_mode_flag:
         await interaction.response.send_message(content='現在別のregistコマンドが実行中です。お手数ですが、時間を空けてから再度お試しください。', ephemeral=True)
         logfile_rw.write_logfile('info', 'session', f'Regist cancelled by duplicate. {interaction.user.name}')
         return
@@ -229,7 +226,7 @@ async def regist(interaction: discord.Interaction, st_num: str, st_name: str, st
     fg.sessions.append(session_id)
 
     #registセッション(登録作業の流れ）を開始 グローバルで所持するため１つのみ同時実行できる。
-    regist_session = r.RegistSession(session_id, interaction, st_name, st_num, st_belong.value) #インスタンス生成 グローバルで所有する
+    fg.regist_session = r.RegistSession(session_id, interaction, st_name, st_num, st_belong.value) #インスタンス生成 グローバルで所有する
     logfile_rw.write_logfile('info', 'session', 'Regist session created. ' + str(session_id))
 
     #ボタンの有効期限を1分で設ける（時間制限を別スレッドに投げる）
@@ -269,8 +266,6 @@ async def entering_and_exiting_room(IDm):
 
 @client.tree.command()#コマンドを登録するDiscordサーバ（tree)でスラッシュコマンドを追加するデコレータ
 async def unregist(interaction: discord.Interaction): #登録解除コマンド
-    global unregist_session
-
     #必要情報の取得
     user_id = interaction.user.id
     record_id = db.getRecordIdByUser(user_id)
@@ -282,7 +277,7 @@ async def unregist(interaction: discord.Interaction): #登録解除コマンド
         #登録解除embedとボタンを生成
         await interaction.response.send_message(embed=embed, view=ur.UnregistButton(session_id), ephemeral=True)
         fg.sessions.append(session_id) #セッション生成
-        unregist_session = ur.UnregistSession(session_id, interaction, db) #インスタンス生成 グローバルで所有する
+        fg.unregist_session = ur.UnregistSession(session_id, interaction, db) #インスタンス生成 グローバルで所有する
         fg.tasks.append(asyncio.get_event_loop().create_task(session_button_timelimit(session_id, 60))) #ボタンの有効期限を1分で設ける
 
     #レコードが存在しない場合
@@ -310,7 +305,7 @@ async def card(interaction: discord.Interaction, select: app_commands.Choice[str
 
 #カードタッチを待機するためのメソッド(別スレッドに投げるためのメソッド)
 async def card_touch_waiting_loop():
-    global chs, regist_session
+    global chs
     #カード読み取り関連の処理をインスタンス化
     cardReader = MyCardReader() 
     while True:
@@ -333,8 +328,8 @@ async def card_touch_waiting_loop():
            await entering_and_exiting_room(IDm) #入退室処理
         
         #新規登録モードの場合(登録されてないとデータが取得できない)
-        elif regist_mode_flag: 
-           await regist_session.regist_record(IDm, db)
+        elif fg.regist_mode_flag: 
+           await fg.regist_session.regist_record(IDm, db)
         
         #得たカードのレコードが存在しないならば却下処理
         else:
@@ -375,7 +370,6 @@ async def loop():
                     await i.send(embed=embed)
             
             #ログファイルを再生成する
-            f_global.f.close()
             logfile_rw.make_logfile()
             logfile_rw.write_logfile("info", "bot", "Remake and closed logfile.")
         
