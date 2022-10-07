@@ -301,8 +301,10 @@ class UnregistOkButton(discord.ui.Button):
         global sessions, unregist_session
         #print(str(session_id) + " / " + str(sessions))
         record = db.getRecordIdByUser(interaction.user.id)
+        record_id = record[0]
+
         if self.session_id in sessions:
-            await unregist_session.unregist_record(record[0])
+            await unregist_session.unregist_record(record_id)
             await interaction.response.send_message('データを削除しました。', ephemeral=True)
             sessions.remove(self.session_id) if self.session_id in sessions else None
             logfile_rw.write_logfile('info', 'session', f'Session {self.session_id} unregisted record. {record[0]}')
@@ -331,8 +333,8 @@ class UnregistSession():
         self.session_id = session_id
         self.interaction = interaction
 
-    async def unregist_record(self, user_id):
-        db.removeRecord(user_id)
+    async def unregist_record(self, record_id):
+        db.removeRecord(record_id)
 
 @client.tree.command() #コマンドを登録するDiscordサーバ（tree)でスラッシュコマンドを追加するデコレータ
 @app_commands.describe(
