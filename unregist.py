@@ -24,7 +24,7 @@ class UnregistOkButton(discord.ui.Button):
         record_id = record[0]
 
         if self.session_id in fg.sessions:
-            await fg.unregist_session.unregist_record(record_id)
+            self.db.removeRecord(record_id)
             await interaction.response.send_message('データを削除しました。', ephemeral=True)
             fg.sessions.remove(self.session_id) if self.session_id in fg.sessions else None
             logfile_rw.write_logfile('info', 'session', f'Session {self.session_id} unregisted record. {record[0]}')
@@ -45,13 +45,3 @@ class UnregistNoButton(discord.ui.Button):
         
         else:
             await interaction.response.send_message('このボタンは有効期限が切れています。', ephemeral=True)
-
-#registコマンドが実行された時点でセッションをインスタンス化して保持し、時間切れで消滅する、セッションIDを保持し管理
-class UnregistSession (): 
-    def __init__(self, session_id, interaction, db):
-        self.session_id = session_id
-        self.interaction = interaction
-        self.db = db
-
-    async def unregist_record(self, record_id):
-        self.db.removeRecord(record_id)
