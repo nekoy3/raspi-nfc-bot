@@ -264,6 +264,7 @@ class RegistSession():
         self.st_belong = st_belong
     
     async def regist_record(self, IDm): #学生証登録
+        global regist_reset_flag
         #「固有ID(int)」「学籍番号(string)」「名前(string)」「学生証ID(string)」「discordユーザid(int)」
         # 「登録日(string or datetime)」「最終認証日(string or datetime)」「room_status(boolean)」「所属(string)」
         now_datetime = datetime.datetime.now().strftime('%Y年%m月%d日 %H:%M')
@@ -275,9 +276,11 @@ class RegistSession():
         except Exception as e:
             await dm_channel.send(content="エラーが発生しました。時間を空けてからお試しください。\n" + str(e))
             logfile_rw.write_logfile('error', 'session', f'Session {self.session_id} regist error. {self.st_name} {IDm} error->{str(e)}')
+            regist_reset_flag = True #regist_timelimitメソッドでregistモードをリセットするためのフラグ
         else:
             await dm_channel.send(content=f"学生証の登録が完了しました。登録したデータは/registを実行したチャンネルで/unregistを実行すると削除できます。\nカードID={IDm} 学籍番号={self.st_num} 名前={self.st_name} 様\n登録日時={now_datetime} 所属={self.st_belong}")
             logfile_rw.write_logfile('info', 'session', f'Session {self.session_id} registed record. {self.st_name} {IDm}')
+            regist_reset_flag = True
         finally:
             sessions.remove(self.session_id) if self.session_id in sessions else None
 
