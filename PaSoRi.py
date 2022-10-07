@@ -47,4 +47,8 @@ class MyCardReader(object):
         tmp = self.idm
         self.idm = 0
         return tmp
+    
+    #カードがタッチされているかの状態を取得する（タッチされていたらTrue)
+    def get_on_card(self):
+        return self.on_card
 #read_id(time.time(), 1)
