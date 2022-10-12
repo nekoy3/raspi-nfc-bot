@@ -302,6 +302,15 @@ async def card(interaction: discord.Interaction, select: app_commands.Choice[str
     #(card_unregist)カード削除処理
         #(上記処理中に）同一のカードが自分のユーザIDのレコードに存在しないとき未登録と表示し終了
 
+#カード認証忘れ関連の修正を手動で行えるコマンド
+@client.tree.cmmand()
+@app_commands.choices(select=[
+        app_commands.Choice(name="前回の入退室時刻を修正したい", value="fix_time"),
+        app_commands.Choice(name="退室認証を忘れたので認証する", value="add_roomout")
+        ])
+async def fix(interaction: discord.Interaction, select: app_commands.Choice[str]):
+    pass
+
 #カードタッチを待機するためのメソッド(別スレッドに投げるためのメソッド)
 async def card_touch_waiting_loop():
     global chs
