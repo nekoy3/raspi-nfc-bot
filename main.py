@@ -311,7 +311,7 @@ async def card(interaction: discord.Interaction, select: app_commands.Choice[str
 async def fix(interaction: discord.Interaction, select: app_commands.Choice[str]):
     pass
 
-#カードタッチを待機するためのメソッド(別スレッドに投げるためのメソッド)
+#カードタッチを待機するためのメソッド(別スレッドで実行するメソッド)
 async def card_touch_waiting_loop():
     global chs
     #カード読み取り関連の処理をインスタンス化
