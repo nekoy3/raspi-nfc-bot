@@ -42,7 +42,7 @@ class DatabaseClass():
         cur.execute('SELECT user_id FROM students WHERE id=?', (record_id,))
         user_id = cur.fetchone()[0]
         cur.execute('DELETE FROM students WHERE id=?', (record_id,))
-        cur.execute('DELETE FROM cards WHERE user_id=?', (user_id,))
+        cur.execute('DELETE FROM cards WHERE user_id=?', (user_id,)) #cardsテーブルのレコードで同一ユーザの物はすべて削除する
         self.conn.commit() # データベースへコミット これで変更が反映される
         cur.close()
 
