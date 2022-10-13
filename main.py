@@ -317,7 +317,17 @@ async def card(interaction: discord.Interaction, select: app_commands.Choice[str
     minute='修正後の時間（分）を選択してください。(0~59)'
 )
 async def fix(interaction: discord.Interaction, select: app_commands.Choice[str], hour: app_commands.Range[int, 4, 22], minute: app_commands.Range[int, 0, 59]):
-    pass
+    #データベースにこのユーザーのidが存在するかを検索し、なければ弾く
+    record_id = db.getRecordIdByUser(interaction.user.id)
+    await interaction.response.send_message(content="登録されたデータを確認できませんでした。", ephemeral=True) if not record_id else None
+
+    #select.value==fix_timeの時、認証履歴ログ蓄積テーブルから今日期間内で前回認証時のレコードを持ってきて、なければ弾く
+
+    #そもそも蓄積テーブルがないので後回し
+
+    
+    fixed_time = datetime.datetime.now().strftime('%Y年%m月%d日 %H:%M')
+
 
 #カードタッチを待機するためのメソッド(別スレッドで実行するメソッド)
 async def card_touch_waiting_loop():
