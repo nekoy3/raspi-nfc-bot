@@ -308,12 +308,13 @@ async def card(interaction: discord.Interaction, select: app_commands.Choice[str
     select=[
         app_commands.Choice(name="前回の入退室時刻を修正したい", value="fix_time"),
         app_commands.Choice(name="退室認証を忘れたので認証する", value="add_roomout")
-    ]
+    ],
+    required=True
 )
 @app_commands.describe(
     select='修正する項目を選択してください。',
-    hour='修正後の時間（時）を選択してください。',
-    minute='修正後の時間（分）を選択してください。'
+    hour='修正後の時間（時）を選択してください。(24時間表記：4~22)',
+    minute='修正後の時間（分）を選択してください。(0~59)'
 )
 async def fix(interaction: discord.Interaction, select: app_commands.Choice[str], hour: app_commands.Range[int, 4, 22], minute: app_commands.Range[int, 0, 59]):
     pass
