@@ -310,24 +310,12 @@ async def card(interaction: discord.Interaction, select: app_commands.Choice[str
         app_commands.Choice(name="退室認証を忘れたので認証する", value="add_roomout")
     ]
 )
-@app_commands.Argument(
-    name="hour",
-    min_value=4,
-    max_value=22,
-    required=True
-)
-@app_commands.Argument(
-    name="minute",
-    min_value=0,
-    max_value=59,
-    required=True
-)
 @app_commands.describe(
     select='修正する項目を選択してください。',
     hour='修正後の時間（時）を選択してください。',
     minute='修正後の時間（分）を選択してください。'
 )
-async def fix(interaction: discord.Interaction, select: app_commands.Choice[str], hour: int, minute: int):
+async def fix(interaction: discord.Interaction, select: app_commands.Choice[str], hour: app_commands.Range[int, 4, 22], minute: app_commands.Range[int, 0, 59]):
     pass
 
 #カードタッチを待機するためのメソッド(別スレッドで実行するメソッド)
