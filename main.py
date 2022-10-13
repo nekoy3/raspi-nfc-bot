@@ -139,7 +139,9 @@ async def on_message(message): #on_messageはメッセージが送信された�
         #各チャンネルで送信されたものだった場合それぞれに合ったチャンネルに送信する
         if cid == mybot.cfg.webhook_channel_id_list[0]:
             user_icon = message.author.display_avatar
-            if files is []:
+            if files is [] and message.content == None:
+                return
+            elif files is []:
                 await webhook_sent(mybot.cfg.webhook_channel_id_list[1], user_name, user_icon, content=message.content)
                 return
 
@@ -150,7 +152,9 @@ async def on_message(message): #on_messageはメッセージが送信された�
         
         if cid == mybot.cfg.webhook_channel_id_list[1]:
             user_icon = message.author.display_avatar
-            if files is []:
+            if files is [] and message.content == None:
+                return
+            elif files is []:
                 await webhook_sent(mybot.cfg.webhook_channel_id_list[0], user_name, user_icon, content=message.content)
                 return
 
