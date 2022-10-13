@@ -375,6 +375,11 @@ async def stop(interaction: discord.Interaction): #botを停止するコマン�
     logfile_rw.write_logfile('info', 'bot', 'Bot stopped.')
     print("bye")
 
+@client.tree.command()
+@app_commands.checks.has_permissions(administrator=False)
+async def stop(interaction: discord.Interaction):
+    await interaction.response.send_message('権限者のみ実行することが出来ます。', ephemeral=True)
+
 #常時ループ処理(特定の時間にのみ処理する、定期的に実行する、とか)
 async def loop():
     global stop_warn_infomation_flag
