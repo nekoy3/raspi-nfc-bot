@@ -278,10 +278,9 @@ async def unregist(interaction: discord.Interaction): #登録解除コマンド
     if record_id:
         embed = get_descript_embed('部屋認証システム登録情報の削除', '学生証データの削除を開始します。よろしいですか？', interaction.user.display_name, interaction.user.display_avatar, interaction.created_at, "ボタンは一度のみ、この表示のあと1分有効です。")
         session_id = make_session_id() #セッションIDを生成 
-        #登録解除embedとボタンを生成
+        #登録解除embedとボタンを生成 RegistSessionと異なり、削除処理はOKボタンがすべてそろえている
         await interaction.response.send_message(embed=embed, view=ur.UnregistButton(session_id, db), ephemeral=True)
         fg.sessions.append(session_id) #セッション生成
-        fg.unregist_session = ur.UnregistSession(session_id, interaction, db) #インスタンス生成 グローバルで所有する
         fg.tasks.append(asyncio.get_event_loop().create_task(session_button_timelimit(session_id, 60))) #ボタンの有効期限を1分で設ける
 
     #レコードが存在しない場合
