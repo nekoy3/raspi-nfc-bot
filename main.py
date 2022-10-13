@@ -367,7 +367,7 @@ async def card_touch_waiting_loop():
 
 #コマンドを追加(ry
 @client.tree.command()
-@app_commands.has_permissions(administrator=True)
+@app_commands.checks.has_permissions(administrator=True)
 async def stop(interaction: discord.Interaction): #botを停止するコマンド(最低限)
     await interaction.response.send_message('Bot stopped', ephemeral=True)
     await client.close()
