@@ -318,7 +318,7 @@ async def card(interaction: discord.Interaction, select: app_commands.Choice[str
 @app_commands.describe(
     select='修正する項目を選択してください。',
     hour='修正後の時間（時）を選択してください。',
-    mintue='修正後の時間（分）を選択してください。'
+    minute='修正後の時間（分）を選択してください。'
 )
 async def fix(interaction: discord.Interaction, select: app_commands.Choice[str], hour: app_commands.Choice[str], minute: app_commands.Choice[str]):
     pass
