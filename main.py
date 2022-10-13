@@ -304,11 +304,23 @@ async def card(interaction: discord.Interaction, select: app_commands.Choice[str
 
 #カード認証忘れ関連の修正を手動で行えるコマンド
 @client.tree.command()
-@app_commands.choices(select=[
+@app_commands.choices(
+    select=[
         app_commands.Choice(name="前回の入退室時刻を修正したい", value="fix_time"),
         app_commands.Choice(name="退室認証を忘れたので認証する", value="add_roomout")
-        ])
-async def fix(interaction: discord.Interaction, select: app_commands.Choice[str]):
+    ],
+    hour=[
+        [app_commands.Choice(name=f'{hour}時', value=hour) for hour in range(4, 23)] #4 ~ 22
+    ],
+    minute=[
+        [app_commands.Choice(name=f'{minute}分', value=minute) for minute in range(0, 60, 10)]#0 ~ 50
+    ])
+@app_commands.describe(
+    select='修正する項目を選択してください。',
+    hour='修正後の時間（時）を選択してください。',
+    mintue='修正後の時間（分）を選択してください。'
+)
+async def fix(interaction: discord.Interaction, select: app_commands.Choice[str], hour: app_commands.Choice[str], minute: app_commands.Choice[str]):
     pass
 
 #カードタッチを待機するためのメソッド(別スレッドで実行するメソッド)
