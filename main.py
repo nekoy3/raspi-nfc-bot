@@ -360,6 +360,7 @@ async def stop(interaction: discord.Interaction): #botを停止するコマン�
     await client.close()
     db.disconnectionDatabase()
     logfile_rw.write_logfile('info', 'bot', 'Bot stopped.')
+    print("bye")
 
 #常時ループ処理(特定の時間にのみ処理する、定期的に実行する、とか)
 async def loop():
