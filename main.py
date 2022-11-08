@@ -107,7 +107,7 @@ async def webhook_sent(channel_id, user_name, user_icon, **kwargs):
     async with aiohttp.ClientSession() as session:
         #チャンネルからwebhookを取得してくる、無ければ新たにwebhookを作る
         webhook_urls = await client.get_channel(channel_id).webhooks()
-        if webhook_urls is []:
+        if len(webhook_urls) == 0:
             await ch.create_webhook(name="bot")
             webhook_urls = await client.get_channel(channel_id).webhooks()
             logfile_rw.write_logfile('info', 'gc', 'Created webhook. ' + webhook_urls[0].url)
