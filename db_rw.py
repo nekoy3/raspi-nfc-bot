@@ -72,7 +72,7 @@ class DatabaseClass():
     #カードidで生徒を検索する、返り値は学籍番号
     def getStudentNumberByCard(self, IDm):
         cur = self.conn.cursor()
-        cur.execute('SELECT user_id FROM students INNER JOIN cards ON students.user_id=cards.user_id WHERE idm=?', (IDm,) )
+        cur.execute('SELECT sid FROM students INNER JOIN cards ON students.user_id=cards.user_id WHERE idm=?', (IDm,) )
         exist = cur.fetchone()
         cur.close()
         if exist is None:
@@ -83,7 +83,7 @@ class DatabaseClass():
     #IDmから紐づけられたdiscordのユーザIDを返す
     def getUserIdByIDm(self, IDm) -> Union[int, None]:
         cur = self.conn.cursor()
-        cur.execute('SELECT sid FROM students INNER JOIN cards ON students.user_id=cards.user_id WHERE idm=?', (IDm,) )
+        cur.execute('SELECT user_id FROM students INNER JOIN cards ON students.user_id=cards.user_id WHERE idm=?', (IDm,) )
         exist = cur.fetchone()
         cur.close()
         if exist is None:
