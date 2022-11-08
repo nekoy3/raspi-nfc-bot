@@ -352,6 +352,9 @@ async def card_touch_waiting_loop():
             continue
         elif IDm == touching_idm: #今回取得したIDmとリリースされるまで保持するIDmが同じ場合、カードをタッチし続けていると判定しcontinuteする
             continue
+        else:
+            #初回処理の場合はtouching_idmに記録して後続の処理を続行
+            touching_idm = IDm 
 
         #データベースを検索、存在すればroom_status(bool)も取得
         #room_statusはTrueで入室中、Falseで入室していないことを意味する
