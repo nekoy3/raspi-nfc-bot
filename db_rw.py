@@ -1,4 +1,5 @@
 import sqlite3
+from typing import Union
 
 #https://resanaplaza.com/2021/06/22/%E3%80%90%E5%AE%9F%E7%94%A8%E3%80%91windows%E3%81%AEpython%E3%81%8B%E3%82%89sqlite%E3%82%92%E4%BD%BF%E3%81%86/
 
@@ -71,13 +72,24 @@ class DatabaseClass():
     #カードidで生徒を検索する、返り値は学籍番号
     def getStudentNumberByCard(self, IDm):
         cur = self.conn.cursor()
-        cur.execute('SELECT sid FROM students INNER JOIN cards ON students.user_id=cards.user_id WHERE idm=?', (IDm,) )
+        cur.execute('SELECT user_id FROM students INNER JOIN cards ON students.user_id=cards.user_id WHERE idm=?', (IDm,) )
         exist = cur.fetchone()
         cur.close()
         if exist is None:
             return None
         else:
             return exist[0]
+
+    #IDmから紐づけられたdiscordのユーザIDを返す
+    def getUserIdByIDm(self, IDm) -> Union[int, None]:
+        cur = self.conn.cursor()
+        cur.execute('SELECT sid FROM students INNER JOIN cards ON students.user_id=cards.user_id WHERE idm=?', (IDm,) )
+        exist = cur.fetchone()
+        cur.close()
+        if exist is None:
+            return None
+        else:
+            return int(exist[0])
     
     #discordのユーザidで生徒を検索する、帰り値は所属
     def getBelongByUser(self, idm):
