@@ -350,6 +350,7 @@ async def card_touch_waiting_loop():
     #同じカードがタッチされ続けている場合リリースされるまで保持する
     touching_idm = None
     while True:
+        await asyncio.sleep(0.2)
         await cardReader.read_id(time.time(), 1) #タッチされて離されるまで待機し続ける
         
         #カードからIDmを取得する、取得できてなければ0が返る
