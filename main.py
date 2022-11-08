@@ -353,7 +353,7 @@ async def card_touch_waiting_loop():
         #カードからIDmを取得する、取得できてなければ0が返る
         IDm = cardReader.get_idm() 
         
-        print("IDm = " + IDm + " touching_idm = " + touching_idm)
+        print("IDm = " + str(IDm) + " touching_idm = " + str(touching_idm))
         #カードを取得できていなければこれ以降の処理をpass
         if IDm == 0:
             touching_idm = None
