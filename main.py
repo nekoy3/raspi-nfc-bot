@@ -255,6 +255,9 @@ async def entering_and_exiting_room(IDm):
     #ユーザを取得
     user_id = db.getUserIdByIDm(IDm)
     user = await client.fetch_user(user_id)
+
+    #時間文字列取得
+    date_str = datetime.datetime.now().strftime('%Y年%m月%d日 %H:%M:%S')
     
     #生徒が入室した場合の処理
     if changed_status:
@@ -264,7 +267,7 @@ async def entering_and_exiting_room(IDm):
         st_num = db.getStudentNumberByCard(IDm)
         logfile_rw.write_logfile('info', 'room', f'Changed room_status and Entering room. idm={IDm}, now_room_count={count} st_num={st_num} belong={belong}')
         #ユーザに入退室認証の情報をdmで送信する
-        await user.send(content="（入退室認証通知）部屋を入室しました。")
+        await user.send(content=f"（入退室認証通知）[{date_str}]部屋を入室しました。")
     
     #生徒が退室した場合の処理
     else:
@@ -273,7 +276,7 @@ async def entering_and_exiting_room(IDm):
             await ch.send(embed=embed)
         st_num = db.getStudentNumberByCard(IDm)
         logfile_rw.write_logfile('info', 'room', f'Changed room_status and Exiting room. idm={IDm}, now_room_count={count} st_num={st_num} belong={belong}')
-        await user.send(content="（入退室認証通知）部屋を退室しました。")
+        await user.send(content=f"（入退室認証通知）[{date_str}]部屋を退室しました。")
 
 @client.tree.command()#コマンドを登録するDiscordサーバ（tree)でスラッシュコマンドを追加するデコレータ
 async def unregist(interaction: discord.Interaction): #登録解除コマンド
