@@ -336,6 +336,9 @@ async def card_touch_waiting_loop():
     global chs
     #カード読み取り関連の処理をインスタンス化
     cardReader = MyCardReader() 
+
+    #同じカードがタッチされ続けている場合リリースされるまで保持する
+    touching_idm = None
     while True:
         await asyncio.sleep(1)
         await cardReader.read_id(time.time(), 1) #タッチされて離されるまで待機し続ける
@@ -345,6 +348,9 @@ async def card_touch_waiting_loop():
         
         #カードを取得できていなければこれ以降の処理をpass
         if IDm == 0:
+            touching_idm = None
+            continue
+        elif IDm == touching_idm: #今回取得したIDmとリリースされるまで保持するIDmが同じ場合、カードをタッチし続けていると判定しcontinuteする
             continue
 
         #データベースを検索、存在すればroom_status(bool)も取得
@@ -365,7 +371,7 @@ async def card_touch_waiting_loop():
                 await ch.send(content='登録されていないカードが検出されました。\n初めて利用する場合は/registコマンドを使って登録処理を行ってからカードをタッチしてください。')
             logfile_rw.write_logfile('info', 'card', 'This card is not registed. IDm=' + str(IDm))
 
-#コマンドを追加(ry
+#コマンドを追加
 @client.tree.command()
 @app_commands.checks.has_permissions(administrator=True)
 async def stop(interaction: discord.Interaction): #botを停止するコマンド(最低限)
