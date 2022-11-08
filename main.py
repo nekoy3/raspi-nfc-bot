@@ -240,7 +240,7 @@ async def regist(interaction: discord.Interaction, st_num: str, st_name: str, st
 async def entering_and_exiting_room(IDm):
     #changed_statusはFalseになったら退室した、Trueになったら入室した、という判定
     #このIDmの生徒が部屋に入室->退室 もしくは退室->入室の処理をして、その生徒の状態偏移語の状態と所属サーバーを取得
-    db.printFetchStudent(IDm) #検証用
+    #db.printFetchStudent(IDm) #検証用
     changed_status, belong = db.changeStudentRoomStatus(IDm) 
     
     #部屋人数の取得
