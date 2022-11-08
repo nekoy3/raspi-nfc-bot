@@ -254,7 +254,7 @@ async def entering_and_exiting_room(IDm):
     
     #ユーザを取得
     user_id = db.getUserIdByIDm(IDm)
-    user = client.fetch_user(user_id)
+    user = await client.fetch_user(user_id)
     
     #生徒が入室した場合の処理
     if changed_status:
