@@ -69,7 +69,7 @@ async def on_ready(): #on_readyはbotが起動しログイン完了時に一度�
     print('Logged in as\n' + client.user.name + "\n" + str(client.user.id) + "\n------")
 
     #botの状態を変更
-    await client.change_presence(status=discord.Status.online, activity=discord.Game('/register, /gc'))
+    await client.change_presence(status=discord.Status.online, activity=discord.Game('/register'))
     await client.user.edit(username='保留')
 
     #configで設定したチャンネルが同一の物であれば、1つで統一
