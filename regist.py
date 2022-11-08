@@ -77,13 +77,13 @@ class RegistSession():
         user_id = self.interaction.user.id
 
         try:
-            db.addRecord(self.st_num, self.st_name, IDm, user_id, now_datetime, True, self.st_belong)
+            db.addRecord(self.st_num, self.st_name, IDm, user_id, now_datetime, False, self.st_belong)
         except Exception as e:
             await dm_channel.send(content="エラーが発生しました。時間を空けてからお試しください。\n" + str(e))
             logfile_rw.write_logfile('error', 'session', f'Session {self.session_id} regist error. {self.st_name} {IDm} error->{str(e)}')
             fg.regist_reset_flag = True #regist_timelimitメソッドでregistモードをリセットするためのフラグ
         else:
-            await dm_channel.send(content=f"学生証の登録が完了しました。登録したデータは/registを実行したチャンネルで/unregistを実行すると削除できます。\nカードID={IDm} 学籍番号={self.st_num} 名前={self.st_name} 様\n登録日時={now_datetime} 所属={self.st_belong}")
+            await dm_channel.send(content=f"学生証の登録が完了しました。登録したデータは/registを実行したチャンネルで/unregistを実行すると削除できます。\nカードID={IDm} 学籍番号={self.st_num} 名前={self.st_name} 様\n登録日時={now_datetime} 所属={self.st_belong}\n\nこの後部屋に滞在する場合は早速入室認証をしましょう！（再度カードをタッチしてください。）")
             logfile_rw.write_logfile('info', 'session', f'Session {self.session_id} registed record. {self.st_name} {IDm}')
             fg.regist_reset_flag = True
         finally:
