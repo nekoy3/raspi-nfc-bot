@@ -146,6 +146,7 @@ async def on_message(message): #on_messageはメッセージが送信された�
             for channel_id in channel_ids:
                 await webhook_sent(channel_id, message.author.display_name, message.author.display_avatar, content=message.content, files=files)
 
+        await message.reply(content='送信しました。', delete_after=3.0)
     '''
     #メッセージが送信されたチャンネルのidを取得
     cid = message.channel.id
@@ -184,8 +185,6 @@ async def on_message(message): #on_messageはメッセージが送信された�
                 await webhook_sent(mybot.cfg.webhook_channel_id_list[0], user_name, user_icon, files=files)
         '''
     
-        await message.reply(content='送信しました。', delete_after=3.0)
-
 fg.on_regist_mode = False #registモードであるかを確認するフラグ
 fg.on_regist_reset = False #registモードを解除するためのフラグ
 
