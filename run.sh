@@ -2,34 +2,42 @@
 #自身のファイルパスへ移動
 cd /home/pi/raspi-nfc-bot
 
-#botをscreenで起動
-for i in 13
+log() {
+  date=`date`
+  msg="[${date}] $1"
+  echo $msg >> run.log
+}
+
+log "起動スクリプト開始"
+    
+#pingでネットにつながるまで待機
+for i in 181
 do
-  #botをscreen（仮想端末）で起動する
-  screen -S raspi_bot -dm python main.py
-  sleep 5
-  #起動に成功していたら$?に0を返す
-  screen -ls | grep raspi_bot
+  ping discord.com -c 1 >> /dev/null
+  sleep 1
   
-  #起動に成功(0)していたらスクリプトを終了し、失敗(1)したら繰り返す
+  #成功(0)していたらスクリプトを終了し、失敗(1)したら繰り返す
   if [ $? == 0 ]; then
-    break
-  elif [ $i == 12 ]; then #タイムアウト
-    date=`date` #日付文字列取得
-    msg="[${date}] 起動に失敗しました。"
-    echo $msg >> run.log
+    #botを起動する
+    log "起動します"
+    python main.py >> run.log
+    log "botが停止"
+    exit
+    
+  elif [ $i == 180 ]; then #タイムアウト
+    log "起動に失敗しました。"
     exit
   fi
 done
-
-date=`date`
-msg="[${date}] 起動しました。"
-echo $msg >> run.log
-exit
 #botが停止した場合にはscreenも勝手に消滅する
 
-#crontabの設定
-#sudo crontab -eに定期リブートの設定
-#crontab -eにbot自動起動の設定
-
-#tail -f /var/log/syslog でcronの実行状況を確認可能
+#systemdを使って起動するように構成を変更
+# systemctl --user start discordBot.service
+# nano ~/.config/systemd/user/discordBot.service
+#
+#書き換えたら以下でリロードして再度自動起動をenableにする必要がある
+# systemctl --user daemon-reload
+# systemctl --user enable discordBot.service
+#
+#状態を確認する
+# systemctl --user status discordBot.service
