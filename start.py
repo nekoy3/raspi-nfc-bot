@@ -22,14 +22,6 @@ def main():
     
     print('Starting...')
 
-    try:
-        if sys.argv[1] == 'continue':
-            mybot.continue_flag = True
-        else:
-            mybot.continue_flag = False
-    except:
-        mybot.continue_flag = False
-
     return mybot
 
 if __name__ == '__main__':
