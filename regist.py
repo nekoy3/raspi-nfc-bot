@@ -8,19 +8,19 @@ import f_global as fg
 
 #registerモードをonにし、新規registerコマンド受付を停止、登録済みカードはレコードを比較し通常通り認証する
 async def regist_timelimit(client): 
-    fg.regist_mode_flag = True
+    fg.on_regist_mode = True
     await client.change_presence(status=discord.Status.online, activity=discord.Game('Registing mode'))
     #print("regist mode on") #デバッグ用
     sec = 15
     while sec > 0:
         await asyncio.sleep(1)
-        if fg.regist_reset_flag:
-            fg.regist_reset_flag = False
+        if fg.on_regist_reset:
+            fg.on_regist_reset = False
             print("regist mode broken")
             break
         sec-=1
         #print(sec)
-    fg.regist_mode_flag = False
+    fg.on_regist_mode = False
     await client.change_presence(status=discord.Status.online, activity=discord.Game('/register, /gc'))
     #print("regist mode off")
 
@@ -81,10 +81,10 @@ class RegistSession():
         except Exception as e:
             await dm_channel.send(content="エラーが発生しました。時間を空けてからお試しください。\n" + str(e))
             logfile_rw.write_logfile('error', 'session', f'Session {self.session_id} regist error. {self.st_name} {IDm} error->{str(e)}')
-            fg.regist_reset_flag = True #regist_timelimitメソッドでregistモードをリセットするためのフラグ
+            fg.on_regist_reset = True #regist_timelimitメソッドでregistモードをリセットするためのフラグ
         else:
             await dm_channel.send(content=f"学生証の登録が完了しました。登録したデータは/registを実行したチャンネルで/unregistを実行すると削除できます。\nカードID={IDm} 学籍番号={self.st_num} 名前={self.st_name} 様\n登録日時={now_datetime} 所属={self.st_belong}\n\nこの後部屋に滞在する場合は早速入室認証をしましょう！（再度カードをタッチしてください。）")
             logfile_rw.write_logfile('info', 'session', f'Session {self.session_id} registed record. {self.st_name} {IDm}')
-            fg.regist_reset_flag = True
+            fg.on_regist_reset = True
         finally:
             fg.sessions.remove(self.session_id) if self.session_id in fg.sessions else None

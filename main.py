@@ -166,8 +166,8 @@ async def on_message(message): #on_messageはメッセージが送信された�
     
         await message.reply(content='送信しました。', delete_after=3.0)
 
-fg.regist_mode_flag = False #registモードであるかを確認するフラグ
-fg.regist_reset_flag = False #registモードを解除するためのフラグ
+fg.on_regist_mode = False #registモードであるかを確認するフラグ
+fg.on_regist_reset = False #registモードを解除するためのフラグ
 
 '''
 embedのボタンについての処理
@@ -211,7 +211,7 @@ def make_session_id():
         ]) #st_belong引数で選択肢を表示するためのデコレータ
 async def regist(interaction: discord.Interaction, st_num: str, st_name: str, st_belong: app_commands.Choice[str]):
     #registセッション保持中の場合弾く
-    if fg.regist_mode_flag:
+    if fg.on_regist_mode:
         await interaction.response.send_message(content='現在別のregistコマンドが実行中です。お手数ですが、時間を空けてから再度お試しください。', ephemeral=True)
         logfile_rw.write_logfile('info', 'session', f'Regist cancelled by duplicate. {interaction.user.name}')
         return
@@ -376,7 +376,7 @@ async def card_touch_waiting_loop():
            await entering_and_exiting_room(IDm) #入退室処理
         
         #新規登録モードの場合(登録されてないとデータが取得できない)
-        elif fg.regist_mode_flag: 
+        elif fg.on_regist_mode: 
            await fg.regist_session.regist_record(IDm, db)
         
         #得たカードのレコードが存在しないならば却下処理
