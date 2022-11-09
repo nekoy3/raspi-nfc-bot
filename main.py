@@ -93,8 +93,8 @@ async def webhook_sent(channel_id, user_name, user_icon, **kwargs):
     #kwargsは可変長引数で、「key=value」といった記述をすることで、dict型でセットで渡すことが出来る。
     #この場合kwargs['key']でvalueを得る事が出来る。
     
-    #contentは送信するメッセージ内容、空のまま送信するとエラーになるのでNo text Messageを送信する
-    content = kwargs.setdefault('content', 'No text message') 
+    #contentは送信するメッセージ内容、空のまま送信するとエラーになるので空白を送信する
+    content = kwargs.setdefault('content', ' ') 
 
     #filesが存在するならそれを代入、なければNoneにしておく
     files = kwargs['files'] if 'files' in kwargs else None 
@@ -128,6 +128,25 @@ async def on_message(message): #on_messageはメッセージが送信された�
     if message.author == client.user or message.webhook_id is not None: 
         return
     
+    #参考 https://github.com/tsuyopon123/discord-channel-sync/blob/master/app.py
+    if message.channel.id in mybot.cfg.webhook_channel_id_list:
+        channel_ids = mybot.cfg.webhook_channel_id_list
+        #indexメソッドでその要素のインデックスを取得する
+        msg_guild_index = channel_ids.index(message.channel.id)
+        #pop()と同意義
+        del channel_ids[msg_guild_index]
+        #ファイル類を取得
+        files = [await a.to_file() for a in message.attachments]
+
+        #filesが空
+        if not files:
+            for channel_id in channel_ids:
+                await webhook_sent(channel_id, message.author.display_name, message.author.display_avatar, content=message.content, files=files)
+        else:
+            for channel_id in channel_ids:
+                await webhook_sent(channel_id, message.author.display_name, message.author.display_avatar, content=message.content, files=files)
+
+    '''
     #メッセージが送信されたチャンネルのidを取得
     cid = message.channel.id
     #送信されたチャンネルがconfigで設定されたチャンネルであれば、送信するために必要なデータを取得する。
@@ -137,6 +156,7 @@ async def on_message(message): #on_messageはメッセージが送信された�
         files = [await a.to_file() for a in message.attachments]
 
         #各チャンネルで送信されたものだった場合それぞれに合ったチャンネルに送信する
+
         if cid == mybot.cfg.webhook_channel_id_list[0]:
             user_icon = message.author.display_avatar
             if files is [] and message.content == None:
@@ -162,9 +182,9 @@ async def on_message(message): #on_messageはメッセージが送信された�
                 await webhook_sent(mybot.cfg.webhook_channel_id_list[0], user_name, user_icon, content=message.content, files=files)
             except discord.errors.HTTPException:
                 await webhook_sent(mybot.cfg.webhook_channel_id_list[0], user_name, user_icon, files=files)
-
+        '''
     
-        await message.reply(content='送信しました。', delete_after=3.0)
+    await message.reply(content='送信しました。', delete_after=3.0)
 
 fg.on_regist_mode = False #registモードであるかを確認するフラグ
 fg.on_regist_reset = False #registモードを解除するためのフラグ
