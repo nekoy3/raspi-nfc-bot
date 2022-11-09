@@ -69,7 +69,7 @@ async def on_ready(): #on_readyはbotが起動しログイン完了時に一度�
     print('Logged in as\n' + client.user.name + "\n" + str(client.user.id) + "\n------")
 
     #botの状態を変更
-    await client.change_presence(status=discord.Status.online, activity=discord.Game('/register'))
+    await client.change_presence(status=discord.Status.online, activity=discord.Game('/help'))
     await client.user.edit(username='RMBくん')
 
     #configで設定したチャンネルが同一の物であれば、1つで統一
@@ -215,6 +215,10 @@ async def regist(interaction: discord.Interaction, st_num: str, st_name: str, st
         await interaction.response.send_message(content='現在別のregistコマンドが実行中です。お手数ですが、時間を空けてから再度お試しください。', ephemeral=True)
         logfile_rw.write_logfile('info', 'session', f'Regist cancelled by duplicate. {interaction.user.name}')
         return
+    
+    #そのユーザのレコードが存在すれば弾く（複数カード機能実装時には削除すること）
+    if db.getRecordIdByUser(interaction.user.id) != None:
+        await interaction.response.send_message(content='既に登録されたカードが存在します。何らかの手違いか再登録したい場合は/unregist コマンドを使用して登録を削除してから再度登録してください。', ephemeral=True)
     
     #registコマンド実行中のフラグはregist_timelimitメソッドで動作
 
