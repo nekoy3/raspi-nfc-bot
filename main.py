@@ -70,7 +70,7 @@ async def on_ready(): #on_readyはbotが起動しログイン完了時に一度�
 
     #botの状態を変更
     await client.change_presence(status=discord.Status.online, activity=discord.Game('/register'))
-    await client.user.edit(username='保留')
+    await client.user.edit(username='RMBくん')
 
     #configで設定したチャンネルが同一の物であれば、1つで統一
     if mybot.cfg.channel_id_list[0] == mybot.cfg.channel_id_list[1]:
