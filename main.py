@@ -94,7 +94,7 @@ async def webhook_sent(channel_id, user_name, user_icon, **kwargs):
     #この場合kwargs['key']でvalueを得る事が出来る。
     
     #contentは送信するメッセージ内容、空のまま送信するとエラーになるので空白を送信する
-    content = kwargs.setdefault('content', ' ') 
+    content = kwargs.setdefault('content', '.') 
 
     #filesが存在するならそれを代入、なければNoneにしておく
     files = kwargs['files'] if 'files' in kwargs else None 
@@ -141,7 +141,7 @@ async def on_message(message): #on_messageはメッセージが送信された�
         #filesが空
         if not files:
             for channel_id in channel_ids:
-                await webhook_sent(channel_id, message.author.display_name, message.author.display_avatar, content=message.content, files=files)
+                await webhook_sent(channel_id, message.author.display_name, message.author.display_avatar, content=message.content)
         else:
             for channel_id in channel_ids:
                 await webhook_sent(channel_id, message.author.display_name, message.author.display_avatar, content=message.content, files=files)
@@ -184,7 +184,7 @@ async def on_message(message): #on_messageはメッセージが送信された�
                 await webhook_sent(mybot.cfg.webhook_channel_id_list[0], user_name, user_icon, files=files)
         '''
     
-    await message.reply(content='送信しました。', delete_after=3.0)
+        await message.reply(content='送信しました。', delete_after=3.0)
 
 fg.on_regist_mode = False #registモードであるかを確認するフラグ
 fg.on_regist_reset = False #registモードを解除するためのフラグ
