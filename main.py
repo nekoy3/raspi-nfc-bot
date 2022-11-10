@@ -133,9 +133,9 @@ async def on_message(message): #on_messageはメッセージが送信された�
     if message.author == client.user or message.webhook_id is not None: 
         return
     
+    channel_ids = mybot.cfg.webhook_channel_id_list
     #参考 https://github.com/tsuyopon123/discord-channel-sync/blob/master/app.py
-    if message.channel.id in mybot.cfg.webhook_channel_id_list:
-        channel_ids = mybot.cfg.webhook_channel_id_list
+    if message.channel.id in channel_ids:
         #indexメソッドでその要素のインデックスを取得する
         msg_guild_index = channel_ids.index(message.channel.id)
         #pop()と同意義
