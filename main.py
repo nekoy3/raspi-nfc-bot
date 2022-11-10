@@ -300,7 +300,7 @@ async def card(interaction: discord.Interaction, select: app_commands.Choice[str
     #(card_unregist)カードが一枚の時、これ以上削除できない趣旨の通知をして終わる
 
     #(card_regist)カード追加処理
-        #(上記処理中に）同一のカードがDBのどこかにあれば使用済みと表示し終了
+        #(上記処理中に）同一のカードがDBの自身のレコードにあれば使用済みと表示し終了
 
     #(card_unregist)カード削除処理
         #(上記処理中に）同一のカードが自分のユーザIDのレコードに存在しないとき未登録と表示し終了
@@ -362,7 +362,7 @@ async def card_touch_waiting_loop():
         student_room_status = db.getRoomStateByCard(IDm) #部屋状況(bool)を返す、存在しない場合None
 
         #データが取得できた場合
-        if student_room_status is not None: 
+        if student_room_status is not None: #(TrueでもFalseでも実行する、Noneのみ実行しない)
            await entering_and_exiting_room(IDm) #入退室処理
         
         #新規登録モードの場合(登録されてないとデータが取得できない)
@@ -380,10 +380,10 @@ async def card_touch_waiting_loop():
 @app_commands.checks.has_permissions(administrator=True)
 async def stop(interaction: discord.Interaction): #botを停止するコマンド(最低限)
     await interaction.response.send_message('Bot stopped', ephemeral=True)
-    await client.close()
     db.disconnectionDatabase()
     logfile_rw.write_logfile('info', 'bot', 'Bot stopped.')
     print("bye")
+    await client.close()
 
 #常時ループ処理(特定の時間にのみ処理する、定期的に実行する、とか)
 async def loop():
