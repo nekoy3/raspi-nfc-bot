@@ -388,8 +388,7 @@ async def stop(interaction: discord.Interaction): #botを停止するコマン�
 
 #常時ループ処理(特定の時間にのみ処理する、定期的に実行する、とか)
 async def loop():
-    global stop_warn_infomation_flag
-    global stop_warn_count
+    global stop_warn_infomation_flag, stop_warn_count
     
     while True:
         #部屋人数取得
