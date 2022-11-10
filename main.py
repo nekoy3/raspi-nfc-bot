@@ -398,10 +398,10 @@ async def loop():
             stNumString += st_num + " "
 
         #現在時刻取得
-        now = datetime.now().strftime('%H:%M')
+        now = datetime.datetime.now().strftime('%H:%M')
         #人数カウントリセット時刻になったとき
         #if now == mybot.cfg.daily_reset_time:
-        if now == '14:10':
+        if now == '14:14':
             if count != 0:
                 db.roomFlagAllFalse()
                 logfile_rw.write_logfile("info", "bot", "Room status all reset.")
