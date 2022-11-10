@@ -99,6 +99,10 @@ async def webhook_sent(channel_id, user_name, user_icon, **kwargs):
     #filesが存在するならそれを代入、なければNoneにしておく
     files = kwargs['files'] if 'files' in kwargs else None 
 
+    #何も存在しない場合は何もせず返す
+    if files is None and content == ".":
+        return
+
     #webhook送信先のチャンネルを引数で与えられたidから取得する
     ch = client.get_channel(channel_id) 
 
@@ -127,7 +131,7 @@ async def on_message(message): #on_messageはメッセージが送信された�
     #送信者がbotかwebhookであるならば返す
     if message.author == client.user or message.webhook_id is not None: 
         return
-    '''
+    
     #参考 https://github.com/tsuyopon123/discord-channel-sync/blob/master/app.py
     if message.channel.id in mybot.cfg.webhook_channel_id_list:
         channel_ids = mybot.cfg.webhook_channel_id_list
@@ -183,6 +187,7 @@ async def on_message(message): #on_messageはメッセージが送信された�
                 await webhook_sent(mybot.cfg.webhook_channel_id_list[0], user_name, user_icon, content=message.content, files=files)
             except discord.errors.HTTPException:
                 await webhook_sent(mybot.cfg.webhook_channel_id_list[0], user_name, user_icon, files=files)
+    '''
     
 fg.on_regist_mode = False #registモードであるかを確認するフラグ
 fg.on_regist_reset = False #registモードを解除するためのフラグ
