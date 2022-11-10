@@ -87,6 +87,7 @@ async def on_ready(): #on_readyはbotが起動しログイン完了時に一度�
     #カードタッチ待機メソッドを別スレッドに投げる
     #非同期処理についてはこのファイルの最下行に説明がある
     fg.tasks.append(asyncio.get_event_loop().create_task(card_touch_waiting_loop()))
+    fg.tasks.append(asyncio.get_event_loop().create_task(loop()))
 
 #webhookを送信するメソッド
 async def webhook_sent(channel_id, user_name, user_icon, **kwargs):
@@ -400,8 +401,7 @@ async def loop():
         #現在時刻取得
         now = datetime.datetime.now().strftime('%H:%M')
         #人数カウントリセット時刻になったとき
-        #if now == mybot.cfg.daily_reset_time:
-        if now == '14:14':
+        if now == mybot.cfg.daily_reset_time:
             if count != 0:
                 db.roomFlagAllFalse()
                 logfile_rw.write_logfile("info", "bot", "Room status all reset.")
