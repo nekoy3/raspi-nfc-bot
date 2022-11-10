@@ -151,43 +151,6 @@ async def on_message(message): #on_messageはメッセージが送信された�
                 await webhook_sent(channel_id, message.author.display_name, message.author.display_avatar, content=message.content, files=files)
 
         await message.reply(content='送信しました。', delete_after=3.0)
-    '''
-    #メッセージが送信されたチャンネルのidを取得
-    cid = message.channel.id
-    #送信されたチャンネルがconfigで設定されたチャンネルであれば、送信するために必要なデータを取得する。
-    if cid == mybot.cfg.webhook_channel_id_list[0] or cid == mybot.cfg.webhook_channel_id_list[1]:
-        user_name = message.author.display_name
-        cid = message.channel.id
-        files = [await a.to_file() for a in message.attachments]
-
-        #各チャンネルで送信されたものだった場合それぞれに合ったチャンネルに送信する
-
-        if cid == mybot.cfg.webhook_channel_id_list[0]:
-            user_icon = message.author.display_avatar
-            if files is [] and message.content == None:
-                return
-            elif files is []:
-                await webhook_sent(mybot.cfg.webhook_channel_id_list[1], user_name, user_icon, content=message.content)
-                return
-
-            try:
-                await webhook_sent(mybot.cfg.webhook_channel_id_list[1], user_name, user_icon, content=message.content, files=files)
-            except discord.errors.HTTPException: #ファイル送信時等にcontentが空でエラーが起きるのでcontentを送信しない
-                await webhook_sent(mybot.cfg.webhook_channel_id_list[1], user_name, user_icon, files=files)
-        
-        if cid == mybot.cfg.webhook_channel_id_list[1]:
-            user_icon = message.author.display_avatar
-            if files is [] and message.content == None:
-                return
-            elif files is []:
-                await webhook_sent(mybot.cfg.webhook_channel_id_list[0], user_name, user_icon, content=message.content)
-                return
-
-            try:
-                await webhook_sent(mybot.cfg.webhook_channel_id_list[0], user_name, user_icon, content=message.content, files=files)
-            except discord.errors.HTTPException:
-                await webhook_sent(mybot.cfg.webhook_channel_id_list[0], user_name, user_icon, files=files)
-    '''
     
 fg.on_regist_mode = False #registモードであるかを確認するフラグ
 fg.on_regist_reset = False #registモードを解除するためのフラグ
